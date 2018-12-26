@@ -1,0 +1,13 @@
+README.md
+setup.py
+Spotify_Charts_API.egg-info/PKG-INFO
+Spotify_Charts_API.egg-info/SOURCES.txt
+Spotify_Charts_API.egg-info/dependency_links.txt
+Spotify_Charts_API.egg-info/top_level.txt
+crawler/__init__.py
+crawler/compute_dates.py
+crawler/crawler_base.py
+crawler/crawler_gateway.py
+crawler/log_config.py
+crawler/rudimentary_crawler.py
+crawler/write_to_file.py

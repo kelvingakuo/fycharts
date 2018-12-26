@@ -6,13 +6,14 @@ This was built to fill the gap left when Spotify deprecated their official Spoti
 
 ## INSTALLATION
 ```bash
+pip install Spotify-Charts-API
 ```
 
 
 ## SAMPLE USAGE
 Say you want to extract top 200 daily charts for all time, all regions
 ```python
-import SpotifyChartsAPI as ChartsAPI
+import SpotifyCharts as ChartsAPI
 
 obj = ChartsAPI()
 obj.top200Daily(output_file = 'top_200_daily.csv')

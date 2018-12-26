@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="Spotify-Charts-API",
-    version="0.0.1",
+    version="1.0.0",
     author="Kelvin Gakuo",
     author_email="kelvingakuo@gmail.com",
     description="A fully-fledged installable python package for extracting top 200 and viral 50 charts off of spotifycharts.com",
