@@ -6,20 +6,20 @@ This was built to fill the gap left when Spotify deprecated their official Spoti
 
 ## INSTALLATION
 ```bash
-pip install Spotify-Charts-API
+pip install fycharts
 ```
 
 
 ## SAMPLE USAGE
 Say you want to extract top 200 daily charts for all time, all regions
 ```python
-import SpotifyCharts as ChartsAPI
+from fycharts import SpotifyCharts 
 
-obj = ChartsAPI()
-obj.top200Daily(output_file = 'top_200_daily.csv')
+api = SpotifyCharts.SpotifyCharts()
+api.top200Daily(output_file = 'top_200_daily.csv')
 ```
 Run your program. 
-Watch the terminal for helpful information. This information is also logged in a logs.log file
+Watch the terminal for helpful information.
 
 ## FUNCTIONS AND PARAMETERS
 Four functions, for all data you need are required:

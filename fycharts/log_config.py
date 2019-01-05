@@ -8,8 +8,6 @@ if path.isfile("logs/logs.log"):
 logger = logging.getLogger('meGlobalLogger')
 logger.setLevel(logging.DEBUG)
  
-# Create the Handler for logging data to a file
-file_logger = logging.FileHandler('logs/logs.log')
 
 #Handler for console
 console_logger = logging.StreamHandler()
@@ -18,9 +16,7 @@ console_logger = logging.StreamHandler()
 format = logging.Formatter('%(levelname)s : %(asctime)-15s : %(message)s', '%d/%m/%Y %I:%M:%S %p')
 
 # Add the Formatter to the Handlers
-file_logger.setFormatter(format)
 console_logger.setFormatter(format)
  
 # Add the Handler to the Logger
-logger.addHandler(file_logger)
 logger.addHandler(console_logger)

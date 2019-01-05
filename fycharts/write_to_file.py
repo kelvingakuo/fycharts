@@ -1,6 +1,6 @@
 import pandas as pd
 
-from log_config import logger
+from .log_config import logger
 
 
 def writeToCSV(j, output_file, df):

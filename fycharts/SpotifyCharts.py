@@ -4,10 +4,10 @@ import random
 import sys
 import time
 
-from crawler_base import SpotifyChartsBase
-from compute_dates import returnDatesAndRegions
-from log_config import logger
-from write_to_file import writeToCSV
+from .crawler_base import SpotifyChartsBase
+from .compute_dates import returnDatesAndRegions
+from .log_config import logger
+from .write_to_file import writeToCSV
 
 
 

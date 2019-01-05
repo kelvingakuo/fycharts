@@ -9,7 +9,7 @@ from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import re
 
-from log_config import logger
+from .log_config import logger
 
 
 def emptyDf(size, region, date):
