@@ -19,6 +19,9 @@ api = SpotifyCharts.SpotifyCharts()
 api.top200Daily(output_file = 'top_200_daily.csv')
 ```
 Run your program. 
+```bash
+python myCrawler.py
+```
 Watch the terminal for helpful information.
 
 ## FUNCTIONS AND PARAMETERS
