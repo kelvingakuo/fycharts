@@ -75,7 +75,9 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 		if(start in defaultList):
 			start = datetime.datetime.strptime(start, "%Y-%m-%d")
 		else:
-			logger.error('That start date is invalid. Please try any of these: {}'.format(defaultList))
+			orderedList = sorted(defaultList, key=lambda x: datetime.datetime.strptime(x, "%Y-%m-%d") - datetime.datetime.strptime(start, "%Y-%m-%d"))
+			suggestedList = orderedList[-5:]
+			logger.error('That start date {} is invalid. Did you mean any of these? {}'.format(start, suggestedList))
 			sys.exit(0)
 
 

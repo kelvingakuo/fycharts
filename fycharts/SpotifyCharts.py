@@ -14,11 +14,13 @@ from .write_to_file import writeToCSV
 def validateFile(fileName):
 	if('csv' in fileName):
 			file = fileName
+
+			return file
 	else:
 		logger.error('ONLY CSV EXTENSIONS ALLOWED!!!')
 		sys.exit(0)
 
-	return file
+	
 
 # Class definition
 class SpotifyCharts(SpotifyChartsBase):
@@ -41,7 +43,7 @@ class SpotifyCharts(SpotifyChartsBase):
 		regions = data['region']
 
 		j = 0
-		while(j <= len(dates)):
+		while(j < len(dates)):
 			if((j + 1) == len(dates)): 
 				break
 			theRange = dates[j]+'--'+dates[j+1]
@@ -71,7 +73,7 @@ class SpotifyCharts(SpotifyChartsBase):
 		regions = data['region']
 
 		j = 0
-		while(j <= len(dates)):
+		while(j < len(dates)):
 			theRange = dates[j]
 
 			for region in regions:
@@ -99,7 +101,7 @@ class SpotifyCharts(SpotifyChartsBase):
 		regions = data['region']
 
 		j = 0
-		while(j <= len(dates)):
+		while(j < len(dates)):
 			if((j) == len(dates)): 
 				break
 			theRange = dates[j]+'--'+dates[j]
