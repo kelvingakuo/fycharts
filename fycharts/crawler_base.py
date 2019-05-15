@@ -66,7 +66,7 @@ class SpotifyChartsBase(object):
 			"""
 			headers = {'Host':'spotifycharts.com', 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36'}
 
-			retries = Retry(total = 10, backoff_factor = 2, status_forcelist = [500, 502, 503, 504, 404])
+			retries = Retry(total = 3, backoff_factor = 2, status_forcelist = [500, 502, 503, 504, 404])
 
 			try:
 				s = requests.Session()
