@@ -59,45 +59,50 @@ class SpotifyChartsBase(object):
 		return trackId
 
 
-	def makeRequests(self, url, date, region, isSkip, size):
-		"""Make the HTTP request, clean data, and return as df
-		url - The URL to make request
-		isSkip - Whether or not to skip first row of CSV file
-		"""
-		headers = {'Host':'spotifycharts.com', 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36'}
+		def makeRequests(self, url, date, region, isSkip, size):
+			"""Make the HTTP request, clean data, and return as df
+			url - The URL to make request
+			isSkip - Whether or not to skip first row of CSV file
+			"""
+			headers = {'Host':'spotifycharts.com', 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36'}
 
-		retries = Retry(total = 10, backoff_factor = 2, status_forcelist = [500, 502, 503, 504, 404])
+			retries = Retry(total = 3, backoff_factor = 2, status_forcelist = [500, 502, 503, 504, 404])
 
-		s = requests.Session()
-		s.mount('https://', HTTPAdapter(max_retries = retries))
-		res = s.get(url, headers = headers)
+			try:
+				s = requests.Session()
+				s.mount('https://', HTTPAdapter(max_retries = retries))
+				res = s.get(url, headers = headers)
 
-		if(res.status_code == 200):
-			if(res.headers['Content-Type'] == 'text/html; charset=UTF-8'):
+				if(res.status_code == 200):
+					if(res.headers['Content-Type'] == 'text/html; charset=UTF-8'):
+						self.logger.error('***** Data not found. Generating empty dataframe *****')
+
+						df = emptyDf(size, region, date)
+
+					else:
+						data = res.content
+						if(isSkip):
+							df = pd.read_csv(io.StringIO(data.decode('utf-8')), skiprows=1)
+						else:
+							df = pd.read_csv(io.StringIO(data.decode('utf-8')))
+
+						df['date'] = date
+						df['region'] = region
+						df['id'] =  df['URL'].apply(lambda x: self.regex(x))
+						df.drop(['URL'], axis=1, inplace=True)
+
+
+				else:
+					self.logger.error('***** Data not found. Generating empty dataframe *****')
+					df = emptyDf(size, region, date)
+
+				return df
+			except Exception as e:
 				self.logger.error('***** Data not found. Generating empty dataframe *****')
 
 				df = emptyDf(size, region, date)
-
-			else:
-				data = res.content
-				if(isSkip):
-					df = pd.read_csv(io.StringIO(data.decode('utf-8')), skiprows=1)
-				else:
-					df = pd.read_csv(io.StringIO(data.decode('utf-8')))
-
-				df['date'] = date
-				df['region'] = region
-				df['id'] =  df['URL'].apply(lambda x: self.regex(x))
-				df.drop(['URL'], axis=1, inplace=True)
-
-
-		else:
-			self.logger.error('***** Data not found. Generating empty dataframe *****')
-
-			df = emptyDf(size, region, date)
-
-
-		return df
+				
+				return df
 
 
 	def getTop200Weekly(self, date, region):
