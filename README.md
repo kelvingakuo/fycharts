@@ -3,7 +3,7 @@ A fully-fledged installable python package for extracting **top 200** and **vira
 
 In a nutshell, the unofficial Spotify Charts API
 
-**This project replaces this one: https://pypi.org/project/Spotify-Charts-API/**
+**This project replaces the now defunct Spotify-Charts-API**
 
 ## INSPIRATION
 This was built to fill the gap left when Spotify deprecated their official Spotify charts API. It arose as a needed crawler for the Spotify data analysis and machine learning project done [here](https://kelvingakuo.github.io)
