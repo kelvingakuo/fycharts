@@ -3,8 +3,6 @@ A fully-fledged installable python package for extracting **top 200** and **vira
 
 In a nutshell, the unofficial Spotify Charts API
 
-**This project replaces the now defunct Spotify-Charts-API**
-
 ## INSPIRATION
 This was built to fill the gap left when Spotify deprecated their official Spotify charts API. It arose as a needed crawler for the Spotify data analysis and machine learning project done [here](https://kelvingakuo.github.io)
 
@@ -18,10 +16,9 @@ Say you want to extract top 200 daily charts for all time, all regions
 ```python
 myCrawler.py
 
+from fycharts.SpotifyCharts import SpotifyCharts
 
-from fycharts import SpotifyCharts 
-
-api = SpotifyCharts.SpotifyCharts()
+api = SpotifyCharts()
 api.top200Daily(output_file = 'top_200_daily.csv')
 ```
 Run your program. 
@@ -31,7 +28,7 @@ python myCrawler.py
 Watch the terminal for helpful information.
 
 ## FUNCTIONS AND PARAMETERS
-Four functions, for all data you need are required:
+For all the charts provided by Spotify, four functions exist:
 1. top200Weekly
 2. top200Daily
 3. viral50Weekly
@@ -46,7 +43,7 @@ All four functions take the following parameters:
 2. end - End date of range of interest as string YYYY-MM-DD
 3. region - Region of interest, as a country abbreviation code. 'global' is also valid
 
-**Refer to 'SUPPORTED COUNTRY CODES SO FAR' below for important information of this.**
+**Refer to 'SUPPORTED COUNTRY CODES SO FAR' below for important information about the region.**
 
 If not included, data is extracted for all dates, all regions
 

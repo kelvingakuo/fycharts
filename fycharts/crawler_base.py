@@ -32,9 +32,9 @@ def emptyDf(size, region, date):
 	i = list(itertools.repeat("NA", size))
 
 	if(isViral):
-		empty = pd.DataFrame.from_dict({'position': pos, 'track name':track, 'artist':art, 'region': reg, 'date':dat, 'id':i})
+		empty = pd.DataFrame.from_dict({"position": pos, "track name":track, "artist":art, "region": reg, "date":dat, "id":i})
 	else:
-		empty = pd.DataFrame.from_dict({'position': pos, 'track name':track, 'artist':art, 'streams':stre, 'region': reg, 'date':dat, 'id':i})
+		empty = pd.DataFrame.from_dict({"position": pos, "track name":track, "artist":art, "streams":stre, "region": reg, "date":dat, "id":i})
 
 	return empty
 
@@ -46,59 +46,59 @@ class SpotifyChartsBase(object):
 		self.logger = logger
 
 
-	def regex(self, url):
+	def __regex(self, url):
 		"""Extract Track ID from URL
 		url - Spotify track URL
 		"""
 		if(type(url) == str):
-			sr = re.search(r'https://open.spotify.com/track/(.*)' ,url, re.I|re.M)
+			sr = re.search(r"https://open.spotify.com/track/(.*)" ,url, re.I|re.M)
 			trackId = sr.group(1)
 		else:
-			trackId = 'N/A'
+			trackId = "N/A"
 		
 		return trackId
 
 
-	def makeRequests(self, url, date, region, isSkip, size):
+	def __makeRequests(self, url, date, region, isSkip, size):
 			"""Make the HTTP request, clean data, and return as df
 			url - The URL to make request
 			isSkip - Whether or not to skip first row of CSV file
 			"""
-			headers = {'Host':'spotifycharts.com', 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36'}
+			headers = {"Host":"spotifycharts.com", "User-Agent": "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Mobile Safari/537.36"}
 
 			retries = Retry(total = 10, backoff_factor = 2, status_forcelist = [500, 502, 503, 504, 404])
 
 			try:
 				s = requests.Session()
-				s.mount('https://', HTTPAdapter(max_retries = retries))
+				s.mount("https://", HTTPAdapter(max_retries = retries))
 				res = s.get(url, headers = headers)
 
 				if(res.status_code == 200):
-					if(res.headers['Content-Type'] == 'text/html; charset=UTF-8'):
-						self.logger.error('***** Data not found. Generating empty dataframe *****')
+					if(res.headers["Content-Type"] == "text/html; charset=UTF-8"):
+						self.logger.error("***** Data not found. Generating empty dataframe *****")
 
 						df = emptyDf(size, region, date)
 
 					else:
 						data = res.content
 						if(isSkip):
-							df = pd.read_csv(io.StringIO(data.decode('utf-8')), skiprows=1)
+							df = pd.read_csv(io.StringIO(data.decode("utf-8")), skiprows=1)
 						else:
-							df = pd.read_csv(io.StringIO(data.decode('utf-8')))
+							df = pd.read_csv(io.StringIO(data.decode("utf-8")))
 
-						df['date'] = date
-						df['region'] = region
-						df['id'] =  df['URL'].apply(lambda x: self.regex(x))
-						df.drop(['URL'], axis=1, inplace=True)
+						df["date"] = date
+						df["region"] = region
+						df["id"] =  df["URL"].apply(lambda x: self.__regex(x))
+						df.drop(["URL"], axis=1, inplace=True)
 
 
 				else:
-					self.logger.error('***** Data not found. Generating empty dataframe *****')
+					self.logger.error("***** Data not found. Generating empty dataframe *****")
 					df = emptyDf(size, region, date)
 
 				return df
 			except Exception as e:
-				self.logger.error('***** Data not found. Generating empty dataframe *****')
+				self.logger.error(f"***** {e} Data not found. Generating empty dataframe *****")
 
 				df = emptyDf(size, region, date)
 				
@@ -106,45 +106,45 @@ class SpotifyChartsBase(object):
 
 
 	def getTop200Weekly(self, date, region):
-		"""Return df of top 200 weekly
+		"""Base method to return df of top 200 weekly
 		date: Date to extract df
 		region: Region of interest
 		"""
-		url = 'https://spotifycharts.com/regional/{}/weekly/{}/download'.format(region, date)
-		data = self.makeRequests(url, date, region, True, 200)
+		url = "https://spotifycharts.com/regional/{}/weekly/{}/download".format(region, date)
+		data = self.__makeRequests(url, date, region, True, 200)
 
 		return data
 
 	
 	def getTop200Daily(self, date, region):
-		"""Return df of top 200 daily
+		"""Base method to return df of top 200 daily
 		date: Date to extract df
 		region: Region of interest
 		"""
-		url = 'https://spotifycharts.com/regional/{}/daily/{}/download'.format(region, date)
-		data = self.makeRequests(url, date, region, True, 200)
+		url = "https://spotifycharts.com/regional/{}/daily/{}/download".format(region, date)
+		data = self.__makeRequests(url, date, region, True, 200)
 
 		return data
 
 
 	def getViral50Weekly(self, date, region):
-		"""Return df of viral 50 weekly
+		"""Base method to return df of viral 50 weekly
 		date: Date to extract df
 		region: Region of interest
 		"""
-		url = 'https://spotifycharts.com/viral/{}/weekly/{}/download'.format(region, date)
-		data = self.makeRequests(url, date, region, False, 50)
+		url = "https://spotifycharts.com/viral/{}/weekly/{}/download".format(region, date)
+		data = self.__makeRequests(url, date, region, False, 50)
 
 		return data
 
 
 	def getViral50Daily(self, date, region):
-		"""Return df of viral 50 daily
+		"""Base method to return df of viral 50 daily
 		date: Date to extract df
 		region: Region of interest
 		"""
-		url = 'https://spotifycharts.com/viral/{}/daily/{}/download'.format(region, date)
-		data = self.makeRequests(url, date, region, False, 50)
+		url = "https://spotifycharts.com/viral/{}/daily/{}/download".format(region, date)
+		data = self.__makeRequests(url, date, region, False, 50)
 
 		return data
 

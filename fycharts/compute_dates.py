@@ -53,7 +53,7 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 	region - Region of chart. Default is None i.e. Get for all regions
 	"""
 	# Default values
-	regions = ['global', 'ad', 'ar', 'at', 'au', 'be', 'bg', 'bo', 'br', 'ca', 'ch', 'cl', 'co', 'cr', 'cy', 'cz', 'de', 'dk', 'do', 'ec', 'ee', 'es', 'fi', 'fr', 'gb', 'gr', 'gt', 'hk', 'hn', 'hu', 'id', 'ie', 'il', 'is', 'it', 'jp', 'lt', 'lu', 'lv', 'mc', 'mt', 'mx','my', 'ni', 'nl', 'no', 'nz', 'pa', 'pe', 'ph', 'pl', 'pt', 'py', 'ro', 'se', 'sg', 'sk', 'sv', 'th', 'tr', 'tw', 'us', 'uy', 'vn']
+	regions = ["global", "ad", "ar", "at", "au", "be", "bg", "bo", "br", "ca", "ch", "cl", "co", "cr", "cy", "cz", "de", "dk", "do", "ec", "ee", "es", "fi", "fr", "gb", "gr", "gt", "hk", "hn", "hu", "id", "ie", "il", "is", "it", "jp", "lt", "lu", "lv", "mc", "mt", "mx","my", "ni", "nl", "no", "nz", "pa", "pe", "ph", "pl", "pt", "py", "ro", "se", "sg", "sk", "sv", "th", "tr", "tw", "us", "uy", "vn"]
 	viralWeeklyStart = "2017-01-05"
 	topWeeklyStart = "2016-12-22"
 	allDailyStart = "2017-01-01"
@@ -77,7 +77,7 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 		else:
 			orderedList = sorted(defaultList, key=lambda x: datetime.datetime.strptime(x, "%Y-%m-%d") - datetime.datetime.strptime(start, "%Y-%m-%d"))
 			suggestedList = orderedList[-5:]
-			logger.error('That start date {} is invalid. Did you mean any of these? {}'.format(start, suggestedList))
+			logger.error("That start date {} is invalid. Did you mean any of these? {}".format(start, suggestedList))
 			sys.exit(0)
 
 
@@ -95,7 +95,7 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 		if(region in regions):
 			region = [region]
 		else:
-			logger.error('Data for that region does not exist. Please try another region')
+			logger.error(f"Data for the region {region} does not exist. Please try another region")
 			sys.exit(0)
 
 	#Generate list of dates
@@ -120,5 +120,5 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 			if(date<=end):
 				dates.append(date.strftime("%Y-%m-%d"))
 
-	var = {'dates': dates, 'region': region}
+	var = {"dates": dates, "region": region}
 	return var
