@@ -105,7 +105,7 @@ class SpotifyChartsBase(object):
 				return df
 
 
-	def getTop200Weekly(self, date, region):
+	def helperTop200Weekly(self, date, region):
 		"""Base method to return df of top 200 weekly
 		date: Date to extract df
 		region: Region of interest
@@ -116,7 +116,7 @@ class SpotifyChartsBase(object):
 		return data
 
 	
-	def getTop200Daily(self, date, region):
+	def helperTop200Daily(self, date, region):
 		"""Base method to return df of top 200 daily
 		date: Date to extract df
 		region: Region of interest
@@ -127,7 +127,7 @@ class SpotifyChartsBase(object):
 		return data
 
 
-	def getViral50Weekly(self, date, region):
+	def helperViral50Weekly(self, date, region):
 		"""Base method to return df of viral 50 weekly
 		date: Date to extract df
 		region: Region of interest
@@ -138,7 +138,7 @@ class SpotifyChartsBase(object):
 		return data
 
 
-	def getViral50Daily(self, date, region):
+	def helperViral50Daily(self, date, region):
 		"""Base method to return df of viral 50 daily
 		date: Date to extract df
 		region: Region of interest

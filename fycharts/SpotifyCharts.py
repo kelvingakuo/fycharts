@@ -1,8 +1,10 @@
-import datetime
 import pandas as pd
 import random
 import sys
+import threading
 import time
+
+from queue import Queue
 
 from .crawler_base import SpotifyChartsBase
 from .compute_dates import returnDatesAndRegions
@@ -26,6 +28,29 @@ def validateFile(fileName):
 class SpotifyCharts(SpotifyChartsBase):
 	def __init__(self):
 		SpotifyChartsBase.__init__(self)
+		self.data_queue = Queue()
+
+		self.thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+		self.thread.start()
+
+	def __write_to_csv_from_queue(self, data_q):
+		""" Reads a dataframe from the queue, then writes to CSV
+		"""
+		try:
+			work = True
+			while work:
+				data = data_q.get(block = True)
+				if data is None:
+					work = False
+					return
+				else:
+					df = data["df"]
+					j = data["j"]
+					file = data["out_file"]
+
+					writeToCSV(j, file, df)
+		except Exception as e:
+			raise RuntimeError(e)
 
 	def top200Weekly(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for top 200 weekly
@@ -50,12 +75,12 @@ class SpotifyCharts(SpotifyChartsBase):
 
 			for region in regions:
 				self.logger.info('Extracting top 200 weekly for {} - {}'.format(theRange, region))
-				df = super().getTop200Weekly(theRange, region)
+				df = super().helperTop200Weekly(theRange, region)
 
-				writeToCSV(j, file, df)
-				time.sleep(random.randint(0, j))
+				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				self.data_queue.put(dict_for_thread)
 			j = j + 1
-
+		self.data_queue.put(None)
 
 	def top200Daily(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for top 200 daily
@@ -78,12 +103,12 @@ class SpotifyCharts(SpotifyChartsBase):
 
 			for region in regions:
 				self.logger.info('Extracting top 200 daily for {} - {}'.format(theRange, region))
-				df = super().getTop200Daily(theRange, region)
-
-				writeToCSV(j, file, df)
-				time.sleep(random.randint(0, j))
+				df = super().helperTop200Daily(theRange, region)
+				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				self.data_queue.put(dict_for_thread)
 
 			j = j + 1
+		self.data_queue.put(None)
 
 	def viral50Weekly(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for viral 50 weekly
@@ -108,12 +133,13 @@ class SpotifyCharts(SpotifyChartsBase):
 
 			for region in regions:
 				self.logger.info('Extracting viral 50 weekly for {} - {}'.format(theRange, region))
-				df = super().getViral50Weekly(theRange, region)
+				df = super().helperViral50Weekly(theRange, region)
 
-				writeToCSV(j, file, df)
-				time.sleep(random.randint(0, j))
+				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				self.data_queue.put(dict_for_thread)
 
 			j = j + 1
+		self.data_queue.put(None)
 
 	def viral50Daily(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for viral 50 daily
@@ -136,12 +162,15 @@ class SpotifyCharts(SpotifyChartsBase):
 
 			for region in regions:
 				self.logger.info('Extracting viral 50 daily for {} - {}'.format(theRange, region))
-				df = super().getViral50Daily(theRange, region)
+				df = super().helperViral50Daily(theRange, region)
 
-				writeToCSV(j, file, df)
-				time.sleep(random.randint(0, j))
+				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				self.data_queue.put(dict_for_thread)
 
 			j = j + 1
+		self.data_queue.put(None)
+
+		
 
 
 		
