@@ -142,12 +142,12 @@ This function prints a list of valid dates for the kind of data you are interest
 * Custom exceptions
 * A utility method to print valid dates
 * Accepting a list of regions
+
 **Improved**
 * The documentation
-
 ### 1.2.0 5th April 2019
 * Improved date verification
 ### 1.0.1 5th Jan 2019
 * Renamed the project to fycharts
-### 1.0.0 
+### 1.0.0 26th Dec 2018
 * Released project named 'Spotify-Charts-API'
