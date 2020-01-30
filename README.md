@@ -47,6 +47,8 @@ All four functions take the following parameters:
 #### Compulsory
 1. output_file - CSV file to dump the data. 
 
+*For V3.0.0 more outputs e.g. SQL db, REST endpoint etc. will be available. Stay tuned*
+
 #### Optional
 1. start - Start date of range of interest as string with the format YYYY-MM-DD
 2. end - End date of range of interest as string with the format YYYY-MM-DD
