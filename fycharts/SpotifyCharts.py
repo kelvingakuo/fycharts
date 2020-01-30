@@ -51,6 +51,11 @@ class SpotifyCharts(SpotifyChartsBase):
 		except Exception as e:
 			raise RuntimeError(e)
 
+	def __write_to_db_from_queue(self, data_q):
+		""" Reads a dataframe from the queue, then writes to SQL table
+		"""
+		pass
+
 	def top200Weekly(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for top 200 weekly
 		Params:
