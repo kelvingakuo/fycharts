@@ -84,7 +84,7 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
 
 ## A RECIPE ON STERIODS  <a id= "turbo"></a>
 
-Take advantage of multithreading, you may write your code as follows:
+To fully take advantage of multithreading, you may write your code as follows:
 
 ```python
 myCrawler.py
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 ## UTILITY FUNCTIONS <a id = "utils"></a>
 This library exposes some functions that you may find of use:
 
-a. validDates(start, end, desired)
+1. validDates(start, end, desired)
 
 This function prints a list of valid dates for the kind of data you are interested in.
 
