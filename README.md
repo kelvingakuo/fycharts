@@ -11,16 +11,16 @@ In a nutshell, the unofficial Spotify Charts API
 5. [Supported country codes](#codes)
 6. [Turbo-boosted recipe](#turbo)
 7. [Utilities you may find useful](#utils)
+8. [Changelog](#change)
 
 ## INSPIRATION
 This was built to fill the gap left when Spotify deprecated their official Spotify charts API. It arose as a needed crawler for the Spotify data analysis and machine learning project done [here](https://kelvingakuo.github.io)
 
-## INSTALLATION <a id= "in"></a>
+## INSTALLATION <a id="in"></a>
 ```bash
 pip install fycharts
 ```
-
-## SAMPLE USAGE <a id= "sample"></a>
+## SAMPLE USAGE <a id="sample"></a>
 Say you want to extract top 200 daily charts for all time, all regions
 ```python
 myCrawler.py
@@ -95,10 +95,10 @@ from fycharts.SpotifyCharts import SpotifyCharts
 def main():
     api = SpotifyCharts()
 
-    a_thread = threading.Thread(target = api.top200Daily, args = ("top_200_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": "global"})
-    b_thread = threading.Thread(target = api.top200Weekly, args = ("top_200_weekly.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": "global"})
-    c_thread = threading.Thread(target = api.viral50Daily, args = ("viral_50_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": "global"})
-    d_thread = threading.Thread(target = api.viral50Weekly, args = ("viral_50_weekly.csv",), kwargs = {"start": "2020-01-02", "end":"2020-01-12", "region": "global"})
+    a_thread = threading.Thread(target = api.top200Daily, args = ("top_200_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    b_thread = threading.Thread(target = api.top200Weekly, args = ("top_200_weekly.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    c_thread = threading.Thread(target = api.viral50Daily, args = ("viral_50_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    d_thread = threading.Thread(target = api.viral50Weekly, args = ("viral_50_weekly.csv",), kwargs = {"start": "2020-01-02", "end":"2020-01-12", "region": ["global", "us"]})
     
     a_thread.start()
     b_thread.start()
@@ -131,3 +131,23 @@ This function prints a list of valid dates for the kind of data you are interest
             * viral50Weekly
 
 
+
+
+
+
+## CHANGELOG <a id = "change"></a>
+### 2.0.0 30th Jan 2020
+**Added**
+* Multithreading to increase crawling speeds
+* Custom exceptions
+* A utility method to print valid dates
+* Accepting a list of regions
+**Improved**
+* The documentation
+
+### 1.2.0 5th April 2019
+* Improved date verification
+### 1.0.1 5th Jan 2019
+* Renamed the project to fycharts
+### 1.0.0 
+* Released project named 'Spotify-Charts-API'

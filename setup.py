@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fycharts",
-    version="1.2.0",
+    version="2.0.0",
     author="Kelvin Gakuo",
     author_email="kelvingakuo@gmail.com",
     description="A fully-fledged installable python package for extracting top 200 and viral 50 charts off of spotifycharts.com",
