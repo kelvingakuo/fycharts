@@ -30,8 +30,8 @@ class SpotifyCharts(SpotifyChartsBase):
 		SpotifyChartsBase.__init__(self)
 		self.data_queue = Queue()
 
-		self.thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
-		self.thread.start()
+		# self.thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+		# self.thread.start()
 
 	def __write_to_csv_from_queue(self, data_q):
 		""" Reads a dataframe from the queue, then writes to CSV
@@ -67,6 +67,9 @@ class SpotifyCharts(SpotifyChartsBase):
 		dates = data['dates']
 		regions = data['region']
 
+		a_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+		a_thread.start()
+
 		j = 0
 		while(j < len(dates)):
 			if((j + 1) == len(dates)): 
@@ -97,6 +100,9 @@ class SpotifyCharts(SpotifyChartsBase):
 		dates = data['dates']
 		regions = data['region']
 
+		b_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+		b_thread.start()
+
 		j = 0
 		while(j < len(dates)):
 			theRange = dates[j]
@@ -124,6 +130,9 @@ class SpotifyCharts(SpotifyChartsBase):
 
 		dates = data['dates']
 		regions = data['region']
+
+		c_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+		c_thread.start()
 
 		j = 0
 		while(j < len(dates)):
@@ -155,6 +164,9 @@ class SpotifyCharts(SpotifyChartsBase):
 
 		dates = data['dates']
 		regions = data['region']
+
+		d_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+		d_thread.start()
 
 		j = 0
 		while(j < len(dates)):

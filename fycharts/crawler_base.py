@@ -32,9 +32,9 @@ def emptyDf(size, region, date):
 	i = list(itertools.repeat("NA", size))
 
 	if(isViral):
-		empty = pd.DataFrame.from_dict({"position": pos, "track name":track, "artist":art, "region": reg, "date":dat, "id":i})
+		empty = pd.DataFrame.from_dict({"position": pos, "track name":track, "artist":art, "region": reg, "date":dat, "spotify_id":i})
 	else:
-		empty = pd.DataFrame.from_dict({"position": pos, "track name":track, "artist":art, "streams":stre, "region": reg, "date":dat, "id":i})
+		empty = pd.DataFrame.from_dict({"position": pos, "track name":track, "artist":art, "streams":stre, "region": reg, "date":dat, "spotify_id":i})
 
 	return empty
 

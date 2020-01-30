@@ -3,15 +3,23 @@ A fully-fledged installable python package for extracting **top 200** and **vira
 
 In a nutshell, the unofficial Spotify Charts API
 
+## CONTENTS
+1. [Installation](#in)
+2. [Sample](#sample)
+3. [Functions for data extraction and the parameters they accept](#funcs)
+4. [Format for data returned](#format)
+5. [Supported country codes](#codes)
+6. [Turbo-boosted recipe](#turbo)
+
 ## INSPIRATION
 This was built to fill the gap left when Spotify deprecated their official Spotify charts API. It arose as a needed crawler for the Spotify data analysis and machine learning project done [here](https://kelvingakuo.github.io)
 
-## INSTALLATION
+## INSTALLATION <a id= "in"></a>
 ```bash
 pip install fycharts
 ```
 
-## SAMPLE USAGE
+## SAMPLE USAGE <a id= "sample"></a>
 Say you want to extract top 200 daily charts for all time, all regions
 ```python
 myCrawler.py
@@ -27,7 +35,7 @@ python myCrawler.py
 ```
 Watch the terminal for helpful information.
 
-## FUNCTIONS AND PARAMETERS
+## FUNCTIONS AND PARAMETERS <a id= "funcs"></a>
 For all the charts provided by Spotify, four functions exist:
 1. top200Weekly
 2. top200Daily
@@ -39,25 +47,25 @@ All four functions take the following parameters:
 1. output_file - CSV file to dump the data. 
 
 #### Optional
-1. start - Start date of range of interest as string YYYY-MM-DD
-2. end - End date of range of interest as string YYYY-MM-DD
+1. start - Start date of range of interest as string with the format YYYY-MM-DD
+2. end - End date of range of interest as string with the format YYYY-MM-DD
 3. region - Region of interest, as a country abbreviation code. 'global' is also valid
 
 **Refer to 'SUPPORTED COUNTRY CODES SO FAR' below for important information about the region.**
 
 If not included, data is extracted for all dates, all regions
 
-## DATA RETURNED
-The data extracted from spotifycharts.com is written into a CSV file with the following fields:
+## DATA RETURNED  <a id= "format"></a>
+The data extracted from spotifycharts.com is written to the output (usually a CSV file) with the following fields:
 1. position - The song's position during that week or day
 2. track name - Name of the song
 3. artist - Name of artist
 4. region - Region of the chart as a code
 5. date - Date or range of dates of chart
-6. id - Spotify track id
+6. spotify_id - Spotify track id
 7. streams - Number of streams for that week or day. **Only applicable to top 200 charts**
 
-## SUPPORTED COUNTRY CODES SO FAR
+## SUPPORTED COUNTRY CODES SO FAR  <a id= "codes"></a>
 |   |   |   |   |   |   |   |   |
 |---|---|---|---|---|---|---|---|
 |ad |ca |dk |gr |is |mx |ph |sv |
@@ -69,10 +77,40 @@ The data extracted from spotifycharts.com is written into a CSV file with the fo
 |bo |cz |fr |ie |mc |pa |sg |vn |
 |br |de |gb |il |mt |pe |sk |global|
 
-## PASSING DATES AS PARAMETERS
-If the date isn't valid, you shall be notified with a list of the closest dates to what you put in, as suggestions.
-
-
 ## STUFF YOU SHOULD KNOW
 When extracting data for a range of dates, in loop, the crawler sleeps every iteration for a random number of seconds between 0 and the index of the date. Dig into the code to change this!!!
+
+
+## A RECIPE ON STERIODS  <a id= "turbo"></a>
+
+Take advantage of multithreading, you may write your code as follows:
+
+```python
+myCrawler.py
+
+
+import threading
+
+from fycharts.SpotifyCharts import SpotifyCharts
+
+def main():
+    api = SpotifyCharts()
+
+    a_thread = threading.Thread(target = api.top200Daily, args = ("top_200_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": "global"})
+    b_thread = threading.Thread(target = api.top200Weekly, args = ("top_200_weekly.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": "global"})
+    c_thread = threading.Thread(target = api.viral50Daily, args = ("viral_50_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": "global"})
+    d_thread = threading.Thread(target = api.viral50Weekly, args = ("viral_50_weekly.csv",), kwargs = {"start": "2020-01-02", "end":"2020-01-12", "region": "global"})
+    
+    a_thread.start()
+    b_thread.start()
+    c_thread.start()
+    d_thread.start()
+
+
+if __name__ == "__main__":
+    main()
+```
+
+
+**TAKE NOTE:** DO NOT SHARE THE OUTPUT DESTINATION ACROSS THE FUNCTIONS i.e. each function should be writing to its own set of outputs
 
