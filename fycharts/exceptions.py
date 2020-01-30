@@ -1,0 +1,2 @@
+class FyChartsException(Exception):
+    pass

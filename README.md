@@ -10,6 +10,7 @@ In a nutshell, the unofficial Spotify Charts API
 4. [Format for data returned](#format)
 5. [Supported country codes](#codes)
 6. [Turbo-boosted recipe](#turbo)
+7. [Utilities you may find useful](#utils)
 
 ## INSPIRATION
 This was built to fill the gap left when Spotify deprecated their official Spotify charts API. It arose as a needed crawler for the Spotify data analysis and machine learning project done [here](https://kelvingakuo.github.io)
@@ -51,7 +52,9 @@ All four functions take the following parameters:
 2. end - End date of range of interest as string with the format YYYY-MM-DD
 3. region - Region of interest, as a country abbreviation code. 'global' is also valid
 
-**Refer to 'SUPPORTED COUNTRY CODES SO FAR' below for important information about the region.**
+    **region can also be a list of regions e.g. ["global", "us", "fr"]**
+
+    **Refer to [SUPPORTED COUNTRY CODES SO FAR](#codes) below for accepted regions.**
 
 If not included, data is extracted for all dates, all regions
 
@@ -76,10 +79,6 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
 |bg |cy |fi |id |lv |nz |se |uy |
 |bo |cz |fr |ie |mc |pa |sg |vn |
 |br |de |gb |il |mt |pe |sk |global|
-
-## STUFF YOU SHOULD KNOW
-When extracting data for a range of dates, in loop, the crawler sleeps every iteration for a random number of seconds between 0 and the index of the date. Dig into the code to change this!!!
-
 
 ## A RECIPE ON STERIODS  <a id= "turbo"></a>
 
@@ -111,6 +110,24 @@ if __name__ == "__main__":
     main()
 ```
 
-
 **TAKE NOTE:** DO NOT SHARE THE OUTPUT DESTINATION ACROSS THE FUNCTIONS i.e. each function should be writing to its own set of outputs
+
+## UTILITY FUNCTIONS <a id = "utils"></a>
+This library exposes some functions that you may find of use:
+
+a. validDates(start, end, desired)
+
+This function prints a list of valid dates for the kind of data you are interested in.
+
+#### Parameters
+1. start - Start date of range of interest as string with the format YYYY-MM-DD
+2. end - End date of range of interest as string with the format YYYY-MM-DD
+3. desired - A string specifying the kind of data desired
+
+        Accepts:
+            * top200Daily
+            * top200Weekly
+            * viral50Daily
+            * viral50Weekly
+
 

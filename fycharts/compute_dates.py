@@ -3,6 +3,7 @@ import sys
 
 
 from .log_config import logger
+from .exceptions import FyChartsException
 
 
 def defaultListOfDates(isWeekly, isViral):
@@ -23,13 +24,13 @@ def defaultListOfDates(isWeekly, isViral):
 	dates = [] 
 	if(isWeekly): 
 		if(isViral):
-			gen = [start + datetime.timedelta(weeks=x) for x in range(0, (end-start).days+1)]
+			gen = [start + datetime.timedelta(weeks = x) for x in range(0, (end-start).days + 1)]
 			for date in gen:
-				if(date<end):
-					dt = date + datetime.timedelta(days=0)
+				if(date < end):
+					dt = date + datetime.timedelta(days = 0)
 					dates.append(dt.strftime("%Y-%m-%d"))
 		else:
-			gen = [start + datetime.timedelta(weeks=x) for x in range(0, (end-start).days+1)]
+			gen = [start + datetime.timedelta(weeks = x) for x in range(0, (end-start).days + 1)]
 			for date in gen:
 				if(date<end):
 					dt = date + datetime.timedelta(days=1)
@@ -44,7 +45,7 @@ def defaultListOfDates(isWeekly, isViral):
 	return dates
 
 
-def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isViral=False):
+def returnDatesAndRegions(start=None, end=None, theRegs=None, isWeekly=False, isViral=False):
 	"""Return list of dates and regions based on query
 	start - String start of range. Can be None i.e. range is from the beginning of data
 	end - String end of range. Can be None i.e. range is till today
@@ -62,6 +63,17 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 	defaultList = defaultListOfDates(isWeekly, isViral)
 	#--------------------------------------------
 
+	# Helper for Exception handling
+	if(isWeekly and isViral):
+		func = "viral50Weekly"
+	elif(isWeekly and not isViral):
+		func = "top200Weekly"
+	elif(not isWeekly and isViral):
+		func = "viral50Daily"
+	elif(not isWeekly and not isViral):
+		func = "top200Daily"
+	# 
+
 	# Start dates
 	if(start is None): #From the beginning
 		if(isWeekly):
@@ -77,8 +89,7 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 		else:
 			orderedList = sorted(defaultList, key=lambda x: datetime.datetime.strptime(x, "%Y-%m-%d") - datetime.datetime.strptime(start, "%Y-%m-%d"))
 			suggestedList = orderedList[-5:]
-			logger.error("That start date {} is invalid. Did you mean any of these? {}".format(start, suggestedList))
-			sys.exit(0)
+			raise FyChartsException(f"The start date {start} provided for {func} is invalid. Did you mean any of these? {suggestedList}")
 
 
 	# End dates
@@ -89,14 +100,15 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 		
 
 	# Region
-	if(region is None):
+	region = []
+	if(theRegs is None):
 		region = regions
 	else:
-		if(region in regions):
-			region = [region]
-		else:
-			logger.error(f"Data for the region {region} does not exist. Please try another region")
-			sys.exit(0)
+		for aReg in theRegs:
+			if(aReg in regions):
+				region.append(aReg)
+			else:
+				raise FyChartsException(f"Data for the region --> {aReg} <-- requested for {func} does not exist. Please try another region")
 
 	#Generate list of dates
 	dates = [] 
@@ -122,3 +134,24 @@ def returnDatesAndRegions(start=None, end=None, region=None, isWeekly=False, isV
 
 	var = {"dates": dates, "region": region}
 	return var
+
+def whatDates(start, end, desired):
+	
+	if(desired == "top200Daily"):
+		isWeekly = False
+		isViral = False
+	elif(desired == "top200Weekly"):
+		isWeekly = True
+		isViral = False
+	elif(desired == "viral50Daily"):
+		isWeekly = False
+		isViral = True
+	elif(desired == "viral50Weekly"):
+		isWeekly = True
+		isViral = True
+
+	allValids = defaultListOfDates(isWeekly, isViral)
+
+	fin = [date for date in allValids if date <= end and date >= start]
+	
+	return fin

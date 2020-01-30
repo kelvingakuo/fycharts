@@ -1,15 +1,15 @@
-import pandas as pd
-import random
-import sys
+import json
 import threading
-import time
 
 from queue import Queue
 
 from .crawler_base import SpotifyChartsBase
 from .compute_dates import returnDatesAndRegions
+from .compute_dates import whatDates
 from .log_config import logger
 from .write_to_file import writeToCSV
+
+from .exceptions import FyChartsException
 
 
 
@@ -19,8 +19,7 @@ def validateFile(fileName):
 
 			return file
 	else:
-		logger.error('ONLY CSV EXTENSIONS ALLOWED!!!')
-		sys.exit(0)
+		raise FyChartsException('ONLY CSV FILES ALLOWED!!!')
 
 	
 
@@ -54,10 +53,11 @@ class SpotifyCharts(SpotifyChartsBase):
 
 	def top200Weekly(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for top 200 weekly
-		output_file - CSV file to write the data to
-		start - Start of range (YYYY-MM-DD) as string
-		end - End of range (YYYY-MM-DD) as string
-		region - Region to get data for
+		Params:
+			output_file - CSV file to write the data to
+			start - Start of range (YYYY-MM-DD) as string
+			end - End of range (YYYY-MM-DD) as string
+			region - Region to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
@@ -87,10 +87,11 @@ class SpotifyCharts(SpotifyChartsBase):
 
 	def top200Daily(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for top 200 daily
-		output_file - CSV file to write the data to
-		start - Start of range (YYYY-MM-DD) as string
-		end - End of range (YYYY-MM-DD) as string
-		region - Region to get data for
+		Params:
+			output_file - CSV file to write the data to
+			start - Start of range (YYYY-MM-DD) as string
+			end - End of range (YYYY-MM-DD) as string
+			region - Region to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
@@ -118,10 +119,11 @@ class SpotifyCharts(SpotifyChartsBase):
 
 	def viral50Weekly(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for viral 50 weekly
-		output_file - CSV file to write the data to
-		start - Start of range (YYYY-MM-DD) as string
-		end - End of range (YYYY-MM-DD) as string
-		region - Region to get data for
+		Params:
+			output_file - CSV file to write the data to
+			start - Start of range (YYYY-MM-DD) as string
+			end - End of range (YYYY-MM-DD) as string
+			region - Region to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
@@ -152,10 +154,11 @@ class SpotifyCharts(SpotifyChartsBase):
 
 	def viral50Daily(self, output_file, start=None, end=None, region=None):
 		"""Write to file the charts data for viral 50 daily
-		output_file - CSV file to write the data to
-		start - Start of range (YYYY-MM-DD) as string
-		end - End of range (YYYY-MM-DD) as string
-		region - Region to get data for
+		Params:
+			output_file - CSV file to write the data to
+			start - Start of range (YYYY-MM-DD) as string
+			end - End of range (YYYY-MM-DD) as string
+			region - Region to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
@@ -181,6 +184,23 @@ class SpotifyCharts(SpotifyChartsBase):
 
 			j = j + 1
 		self.data_queue.put(None)
+
+	# ====== UTILITY FUNCTIONS ======
+	def validDates(self, start, end, desired):
+		""" Returns a table of valid dates from a start date to an end date provided, for the specific data desired
+		Params:
+			start - Start date of range (YYYY-MM-DD) as string
+			end - End date of range (YYYY-MM-DD) as string
+			desired - A string specifying the kind of data desired
+				Accepts:
+					* top200Daily
+					* top200Weekly
+					* viral50Daily
+					* viral50Weekly
+		"""
+		theDates = whatDates(start, end, desired)
+		print(json.dumps(theDates, indent = 4))
+
 
 		
 
