@@ -57,7 +57,7 @@ class SpotifyCharts(SpotifyChartsBase):
 			output_file - CSV file to write the data to
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
-			region - Region to get data for
+			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
@@ -91,7 +91,7 @@ class SpotifyCharts(SpotifyChartsBase):
 			output_file - CSV file to write the data to
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
-			region - Region to get data for
+			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
@@ -123,7 +123,7 @@ class SpotifyCharts(SpotifyChartsBase):
 			output_file - CSV file to write the data to
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
-			region - Region to get data for
+			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
@@ -158,7 +158,7 @@ class SpotifyCharts(SpotifyChartsBase):
 			output_file - CSV file to write the data to
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
-			region - Region to get data for
+			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
