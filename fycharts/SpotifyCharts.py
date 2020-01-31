@@ -14,12 +14,12 @@ from .exceptions import FyChartsException
 
 
 def validateFile(fileName):
-	if('csv' in fileName):
+	if("csv" in fileName):
 			file = fileName
 
 			return file
 	else:
-		raise FyChartsException('ONLY CSV FILES ALLOWED!!!')
+		raise FyChartsException("ONLY CSV FILES ALLOWED!!!")
 
 	
 
@@ -52,11 +52,11 @@ class SpotifyCharts(SpotifyChartsBase):
 			raise RuntimeError(e)
 
 	def __write_to_db_from_queue(self, data_q):
-		""" Reads a dataframe from the queue, then writes to SQL table
+		""" TODO: Reads a dataframe from the queue, then writes to SQL table
 		"""
 		pass
 
-	def top200Weekly(self, output_file, start=None, end=None, region=None):
+	def top200Weekly(self, output_file, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 weekly
 		Params:
 			output_file - CSV file to write the data to
@@ -67,10 +67,10 @@ class SpotifyCharts(SpotifyChartsBase):
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
 		file = validateFile(output_file)
-		data = returnDatesAndRegions(start, end, region, isWeekly=True, isViral=False)
+		data = returnDatesAndRegions(start, end, region, isWeekly = True, isViral = False)
 
-		dates = data['dates']
-		regions = data['region']
+		dates = data["dates"]
+		regions = data["region"]
 
 		a_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
 		a_thread.start()
@@ -79,18 +79,18 @@ class SpotifyCharts(SpotifyChartsBase):
 		while(j < len(dates)):
 			if((j + 1) == len(dates)): 
 				break
-			theRange = dates[j]+'--'+dates[j+1]
+			theRange = dates[j]+"--"+dates[j+1]
 
+			k = j
 			for region in regions:
-				self.logger.info('Extracting top 200 weekly for {} - {}'.format(theRange, region))
 				df = super().helperTop200Weekly(theRange, region)
-
-				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				dict_for_thread = {"df": df, "out_file": file, "j": k}
 				self.data_queue.put(dict_for_thread)
+				k = k + 1
 			j = j + 1
 		self.data_queue.put(None)
 
-	def top200Daily(self, output_file, start=None, end=None, region=None):
+	def top200Daily(self, output_file, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 daily
 		Params:
 			output_file - CSV file to write the data to
@@ -101,10 +101,10 @@ class SpotifyCharts(SpotifyChartsBase):
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
 		file = validateFile(output_file)
-		data = returnDatesAndRegions(start, end, region, isWeekly=False, isViral=False)
+		data = returnDatesAndRegions(start, end, region, isWeekly = False, isViral = False)
 
-		dates = data['dates']
-		regions = data['region']
+		dates = data["dates"]
+		regions = data["region"]
 
 		b_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
 		b_thread.start()
@@ -113,16 +113,17 @@ class SpotifyCharts(SpotifyChartsBase):
 		while(j < len(dates)):
 			theRange = dates[j]
 
+			k = j
 			for region in regions:
-				self.logger.info('Extracting top 200 daily for {} - {}'.format(theRange, region))
 				df = super().helperTop200Daily(theRange, region)
-				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				dict_for_thread = {"df": df, "out_file": file, "j": k}
 				self.data_queue.put(dict_for_thread)
+				k = k + 1
 
 			j = j + 1
 		self.data_queue.put(None)
 
-	def viral50Weekly(self, output_file, start=None, end=None, region=None):
+	def viral50Weekly(self, output_file, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 weekly
 		Params:
 			output_file - CSV file to write the data to
@@ -133,10 +134,10 @@ class SpotifyCharts(SpotifyChartsBase):
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
 		file = validateFile(output_file)
-		data = returnDatesAndRegions(start, end, region, isWeekly=True, isViral=True)
+		data = returnDatesAndRegions(start, end, region, isWeekly = True, isViral = True)
 
-		dates = data['dates']
-		regions = data['region']
+		dates = data["dates"]
+		regions = data["region"]
 
 		c_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
 		c_thread.start()
@@ -145,19 +146,19 @@ class SpotifyCharts(SpotifyChartsBase):
 		while(j < len(dates)):
 			if((j) == len(dates)): 
 				break
-			theRange = dates[j]+'--'+dates[j]
+			theRange = dates[j]+"--"+dates[j]
 
+			k = j
 			for region in regions:
-				self.logger.info('Extracting viral 50 weekly for {} - {}'.format(theRange, region))
 				df = super().helperViral50Weekly(theRange, region)
-
-				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				dict_for_thread = {"df": df, "out_file": file, "j": k}
 				self.data_queue.put(dict_for_thread)
+				k = k + 1
 
 			j = j + 1
 		self.data_queue.put(None)
 
-	def viral50Daily(self, output_file, start=None, end=None, region=None):
+	def viral50Daily(self, output_file, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 daily
 		Params:
 			output_file - CSV file to write the data to
@@ -168,10 +169,10 @@ class SpotifyCharts(SpotifyChartsBase):
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
 		file = validateFile(output_file)
-		data = returnDatesAndRegions(start, end, region, isWeekly=False, isViral=True)
+		data = returnDatesAndRegions(start, end, region, isWeekly = False, isViral = True)
 
-		dates = data['dates']
-		regions = data['region']
+		dates = data["dates"]
+		regions = data["region"]
 
 		d_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
 		d_thread.start()
@@ -180,12 +181,12 @@ class SpotifyCharts(SpotifyChartsBase):
 		while(j < len(dates)):
 			theRange = dates[j]
 
+			k = j
 			for region in regions:
-				self.logger.info('Extracting viral 50 daily for {} - {}'.format(theRange, region))
 				df = super().helperViral50Daily(theRange, region)
-
-				dict_for_thread = {"df": df, "out_file": file, "j": j}
+				dict_for_thread = {"df": df, "out_file": file, "j": k}
 				self.data_queue.put(dict_for_thread)
+				k = k + 1
 
 			j = j + 1
 		self.data_queue.put(None)

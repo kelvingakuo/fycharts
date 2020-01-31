@@ -138,6 +138,9 @@ This function prints a list of valid dates for the kind of data you are interest
 
 
 ## CHANGELOG <a id = "change"></a>
+### 2.0.1 31st Jan 2020
+**Fixed**
+* A bug in setting the column titles when multiple regions are requested
 ### 2.0.0 30th Jan 2020
 **Added**
 * Multithreading to increase crawling speeds

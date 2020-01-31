@@ -110,6 +110,7 @@ class SpotifyChartsBase(object):
 		date: Date to extract df
 		region: Region of interest
 		"""
+		self.logger.info("Extracting top 200 weekly for {} - {}".format(date, region))
 		url = "https://spotifycharts.com/regional/{}/weekly/{}/download".format(region, date)
 		data = self.__makeRequests(url, date, region, True, 200)
 
@@ -121,6 +122,7 @@ class SpotifyChartsBase(object):
 		date: Date to extract df
 		region: Region of interest
 		"""
+		self.logger.info("Extracting top 200 daily for {} - {}".format(date, region))
 		url = "https://spotifycharts.com/regional/{}/daily/{}/download".format(region, date)
 		data = self.__makeRequests(url, date, region, True, 200)
 
@@ -132,6 +134,7 @@ class SpotifyChartsBase(object):
 		date: Date to extract df
 		region: Region of interest
 		"""
+		self.logger.info("Extracting viral 50 weekly for {} - {}".format(date, region))
 		url = "https://spotifycharts.com/viral/{}/weekly/{}/download".format(region, date)
 		data = self.__makeRequests(url, date, region, False, 50)
 
@@ -143,6 +146,7 @@ class SpotifyChartsBase(object):
 		date: Date to extract df
 		region: Region of interest
 		"""
+		self.logger.info("Extracting viral 50 daily for {} - {}".format(date, region))
 		url = "https://spotifycharts.com/viral/{}/daily/{}/download".format(region, date)
 		data = self.__makeRequests(url, date, region, False, 50)
 
