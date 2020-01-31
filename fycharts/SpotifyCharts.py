@@ -56,7 +56,7 @@ class SpotifyCharts(SpotifyChartsBase):
 		"""
 		pass
 
-	def top200Weekly(self, output_file, start = None, end = None, region = None):
+	def top200Weekly(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 weekly
 		Params:
 			output_file - CSV file to write the data to
@@ -72,8 +72,12 @@ class SpotifyCharts(SpotifyChartsBase):
 		dates = data["dates"]
 		regions = data["region"]
 
-		a_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
-		a_thread.start()
+		if(output_file is not None):
+			a_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			a_thread.start()
+		if(output_db is not None):
+			adb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			adb_thread.start()
 
 		j = 0
 		while(j < len(dates)):
@@ -90,7 +94,7 @@ class SpotifyCharts(SpotifyChartsBase):
 			j = j + 1
 		self.data_queue.put(None)
 
-	def top200Daily(self, output_file, start = None, end = None, region = None):
+	def top200Daily(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 daily
 		Params:
 			output_file - CSV file to write the data to
@@ -106,8 +110,12 @@ class SpotifyCharts(SpotifyChartsBase):
 		dates = data["dates"]
 		regions = data["region"]
 
-		b_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
-		b_thread.start()
+		if(output_file is not None):
+			b_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			b_thread.start()
+		if(output_db is not None):
+			bdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			bdb_thread.start()
 
 		j = 0
 		while(j < len(dates)):
@@ -123,7 +131,7 @@ class SpotifyCharts(SpotifyChartsBase):
 			j = j + 1
 		self.data_queue.put(None)
 
-	def viral50Weekly(self, output_file, start = None, end = None, region = None):
+	def viral50Weekly(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 weekly
 		Params:
 			output_file - CSV file to write the data to
@@ -139,8 +147,12 @@ class SpotifyCharts(SpotifyChartsBase):
 		dates = data["dates"]
 		regions = data["region"]
 
-		c_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
-		c_thread.start()
+		if(output_file is not None):
+			c_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			c_thread.start()
+		if(output_db is not None):
+			cdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			cdb_thread.start()
 
 		j = 0
 		while(j < len(dates)):
@@ -158,7 +170,7 @@ class SpotifyCharts(SpotifyChartsBase):
 			j = j + 1
 		self.data_queue.put(None)
 
-	def viral50Daily(self, output_file, start = None, end = None, region = None):
+	def viral50Daily(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 daily
 		Params:
 			output_file - CSV file to write the data to
@@ -174,8 +186,12 @@ class SpotifyCharts(SpotifyChartsBase):
 		dates = data["dates"]
 		regions = data["region"]
 
-		d_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
-		d_thread.start()
+		if(output_file is not None):
+			d_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			d_thread.start()
+		if(output_db is not None):
+			ddb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			ddb_thread.start()
 
 		j = 0
 		while(j < len(dates)):
