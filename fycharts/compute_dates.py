@@ -88,8 +88,16 @@ def returnDatesAndRegions(start=None, end=None, theRegs=None, isWeekly=False, is
 			start = datetime.datetime.strptime(start, "%Y-%m-%d")
 		else:
 			orderedList = sorted(defaultList, key=lambda x: datetime.datetime.strptime(x, "%Y-%m-%d") - datetime.datetime.strptime(start, "%Y-%m-%d"))
-			suggestedList = orderedList[-5:]
-			raise FyChartsException(f"The start date {start} provided for {func} is invalid. Did you mean any of these? {suggestedList}")
+			closest = [d for d in orderedList if d >= start]
+			suggest = closest[0:5]
+			logger.info(f"The start date {start} provided for {func} is invalid. Wanna give one these a try? {suggest}")
+			choice = input("Enter (1) to use the first suggestion, or (2) to quit and set yourself: ")
+			if(int(choice) == 1):
+				start = datetime.datetime.strptime(suggest[0], "%Y-%m-%d")
+			elif(int(choice) == 2):
+				sys.exit()
+			else:
+				raise FyChartsException("Invalid Choice.")
 
 
 	# End dates

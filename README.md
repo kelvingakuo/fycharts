@@ -9,6 +9,7 @@ In a nutshell, the unofficial Spotify Charts API
 3. [Functions for data extraction and the parameters they accept](#funcs)
 4. [Format for data returned](#format)
 5. [Supported country codes](#codes)
+6. [A note about dates](#dates)
 6. [Turbo-boosted recipe](#turbo)
 7. [Utilities you may find useful](#utils)
 8. [Changelog](#change)
@@ -81,6 +82,11 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
 |bg |cy |fi |id |lv |nz |se |uy |
 |bo |cz |fr |ie |mc |pa |sg |vn |
 |br |de |gb |il |mt |pe |sk |global|
+
+## ABOUT DATES <a id = "dates"></a>
+The start date of the range you're interested in, is very specific for each chart. If you enter an invalid date, you'll be prompted with a list of suggestions and given a choice whether to use fycharts' suggestion or your own.
+
+*If using multithreading to run multiple functions, the prompt comes up but is non-blocking. However, you can still respond*
 
 ## A RECIPE ON STERIODS  <a id= "turbo"></a>
 

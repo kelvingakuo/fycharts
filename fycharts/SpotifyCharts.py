@@ -7,7 +7,7 @@ from .crawler_base import SpotifyChartsBase
 from .compute_dates import returnDatesAndRegions
 from .compute_dates import whatDates
 from .log_config import logger
-from .write_to_file import writeToCSV
+from .write_to_outputs import writeToCSV
 
 from .exceptions import FyChartsException
 
