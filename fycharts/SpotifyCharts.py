@@ -1,5 +1,6 @@
 import json
 import threading
+import re
 
 from queue import Queue
 
@@ -9,6 +10,7 @@ from .compute_dates import whatDates
 from .log_config import logger
 from .write_to_outputs import writeToCSV
 from .write_to_outputs import writeToSQLTable
+from .write_to_outputs import postToRestEndpoint
 
 from .exceptions import FyChartsException
 
@@ -16,12 +18,9 @@ from .exceptions import FyChartsException
 
 def validateFile(fileName):
 	if(".csv" in fileName):
-			file = fileName
-			return file
+			return fileName
 	else:
-		raise FyChartsException("ONLY CSV FILES ALLOWED!!!")
-
-	
+		raise FyChartsException("Only CSV files allowed")
 
 # Class definition
 class SpotifyCharts(SpotifyChartsBase):
@@ -29,6 +28,7 @@ class SpotifyCharts(SpotifyChartsBase):
 		SpotifyChartsBase.__init__(self)
 		self.csv_data_queue = Queue()
 		self.db_data_queue = Queue()
+		self.post_data_queue = Queue()
 
 	def __write_to_csv_from_queue(self, data_q):
 		""" Reads a dataframe from the queue, then writes to CSV
@@ -68,31 +68,54 @@ class SpotifyCharts(SpotifyChartsBase):
 		except Exception as e:
 			raise RuntimeError(e)
 
-	def top200Weekly(self, output_file = None, output_db = None, start = None, end = None, region = None):
+
+	def __post_to_endpoint_from_queue(self, data_q):
+		""" Reads a dataframe from the queue, then POSTs to a REST endpoint
+		"""
+		try:
+			work = True
+			while work:
+				data = data_q.get(block = True)
+				if data is None:
+					work = False
+					return
+				else:
+					df = data["df"]
+					url = data["url"]
+
+					postToRestEndpoint(df, url)
+		except Exception as e:
+			raise RuntimeError(e)
+
+	def top200Weekly(self, output_file = None, output_db = None, webhook = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 weekly
 		Params:
 			output_file - Name of CSV file to write the data to
 			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects)
+			webhook - A (or a list of) rest endpoint to POST data to 
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
-		file = validateFile(output_file)
 		data = returnDatesAndRegions(start, end, region, isWeekly = True, isViral = False)
 
 		dates = data["dates"]
 		regions = data["region"]
 
 		if(output_file is not None):
+			file = validateFile(output_file)
 			a_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			a_thread.start()
 		if(output_db is not None):
 			adb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			adb_thread.start()
+		if(webhook is not None):
+			ahook_thread = threading.Thread(target = self.__post_to_endpoint_from_queue, args = (self.post_data_queue,))
+			ahook_thread.start()
 
-		if(output_file is None and output_db is None):
+		if(output_file is None and output_db is None and webhook is None):
 			raise FyChartsException("Please provide at least one output destination")
 
 		j = 0
@@ -110,35 +133,44 @@ class SpotifyCharts(SpotifyChartsBase):
 				if(output_db is not None):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Weekly"}
 					self.db_data_queue.put(dict_for_db)
+				if(webhook is not None):
+					dict_for_hook = {"df": df, "url": webhook}
+					self.post_data_queue.put(dict_for_hook)
 
 				k = k + 1
 			j = j + 1
 		self.csv_data_queue.put(None)
 		self.db_data_queue.put(None)
+		self.post_data_queue.put(None)
 
-	def top200Daily(self, output_file = None, output_db = None, start = None, end = None, region = None):
+	def top200Daily(self, output_file = None, output_db = None, webhook = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 daily
 		Params:
 			output_file - Name of CSV file to write the data to
 			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects
+			webhook - A (or a list of) rest endpoint to POST data to 
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
-		file = validateFile(output_file)
 		data = returnDatesAndRegions(start, end, region, isWeekly = False, isViral = False)
 
 		dates = data["dates"]
 		regions = data["region"]
 
 		if(output_file is not None):
+			file = validateFile(output_file)
 			b_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			b_thread.start()
 		if(output_db is not None):
 			bdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			bdb_thread.start()
+		if(webhook is not None):
+			bhook_thread = threading.Thread(target = self.__post_to_endpoint_from_queue, args = (self.post_data_queue,))
+			bhook_thread.start()
+
 
 		if(output_file is None and output_db is None):
 			raise FyChartsException("Please provide at least one output destination")
@@ -156,35 +188,44 @@ class SpotifyCharts(SpotifyChartsBase):
 				if(output_db is not None):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Daily"}
 					self.db_data_queue.put(dict_for_db)
+				if(webhook is not None):
+					dict_for_hook = {"df": df, "url": webhook}
+					self.post_data_queue.put(dict_for_hook)
 				k = k + 1
 
 			j = j + 1
 		self.csv_data_queue.put(None)
 		self.db_data_queue.put(None)
+		self.post_data_queue.put(None)
 
-	def viral50Weekly(self, output_file = None, output_db = None, start = None, end = None, region = None):
+	def viral50Weekly(self, output_file = None, output_db = None, webhook = None, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 weekly
 		Params:
 			output_file - Name of CSV file to write the data to
 			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects
+			webhook - A (or a list of) rest endpoint to POST data to 
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
-		file = validateFile(output_file)
 		data = returnDatesAndRegions(start, end, region, isWeekly = True, isViral = True)
 
 		dates = data["dates"]
 		regions = data["region"]
 
 		if(output_file is not None):
+			file = validateFile(output_file)
 			c_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			c_thread.start()
 		if(output_db is not None):
 			cdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			cdb_thread.start()
+		if(webhook is not None):
+			chook_thread = threading.Thread(target = self.__post_to_endpoint_from_queue, args = (self.post_data_queue,))
+			chook_thread.start()
+
 
 		if(output_file is None and output_db is None):
 			raise FyChartsException("Please provide at least one output destination")
@@ -204,35 +245,44 @@ class SpotifyCharts(SpotifyChartsBase):
 				if(output_db is not None):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "viral50Weekly"}
 					self.db_data_queue.put(dict_for_db)
+				if(webhook is not None):
+					dict_for_hook = {"df": df, "url": webhook}
+					self.post_data_queue.put(dict_for_hook)
 				k = k + 1
 
 			j = j + 1
 		self.csv_data_queue.put(None)
 		self.db_data_queue.put(None)
+		self.post_data_queue.put(None)
 
-	def viral50Daily(self, output_file = None, output_db = None, start = None, end = None, region = None):
+	def viral50Daily(self, output_file = None, output_db = None, webhook = None, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 daily
 		Params:
 			output_file - Name of CSV file to write the data to
 			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects
+			webhook - A (or a list of) rest endpoint to POST data to 
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
 
 		* Any parameter passed as None, means ALL data since the beginning up to now
 		"""
-		file = validateFile(output_file)
 		data = returnDatesAndRegions(start, end, region, isWeekly = False, isViral = True)
 
 		dates = data["dates"]
 		regions = data["region"]
 
 		if(output_file is not None):
+			file = validateFile(output_file)
 			d_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			d_thread.start()
 		if(output_db is not None):
 			ddb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			ddb_thread.start()
+		if(webhook is not None):
+			dhook_thread = threading.Thread(target = self.__post_to_endpoint_from_queue, args = (self.post_data_queue,))
+			dhook_thread.start()
+
 
 		if(output_file is None and output_db is None):
 			raise FyChartsException("Please provide at least one output destination")
@@ -250,12 +300,16 @@ class SpotifyCharts(SpotifyChartsBase):
 				if(output_db is not None):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "viral50Daily"}
 					self.db_data_queue.put(dict_for_db)
+				if(webhook is not None):
+					dict_for_hook = {"df": df, "url": webhook}
+					self.post_data_queue.put(dict_for_hook)
 
 				k = k + 1
 
 			j = j + 1
 		self.csv_data_queue.put(None)
 		self.db_data_queue.put(None)
+		self.post_data_queue.put(None)
 
 	# ====== UTILITY FUNCTIONS ======
 	def validDates(self, start, end, desired):

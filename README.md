@@ -39,7 +39,7 @@ myCrawler.py
 from fycharts.SpotifyCharts import SpotifyCharts
 
 api = SpotifyCharts()
-api.top200Daily(output_file = 'top_200_daily.csv')
+api.top200Daily(output_file = "top_200_daily.csv")
 ```
 
 Or you want viral 50 daily charts for January 2019 in the us and globally, to be written into a csv file and a SQLLite db *Note: This works only for fycharts>=3.0.0*
@@ -50,8 +50,8 @@ from fycharts.SpotifyCharts import SpotifyCharts
 import sqlalchemy
 
 api = SpotifyCharts()
-connector = sqlalchemy.create_engine('sqlite:///spotifycharts.db', echo=False)
-api.viral50Daily(output_file = "viral_50_daily.csv", output_db = connector, start = "2019-01-01", end = "2019-01-31", region = ["us", "global"])
+connector = sqlalchemy.create_engine("sqlite:///spotifycharts.db", echo=False)
+api.viral50Daily(output_file = "viral_50_daily.csv", output_db = connector, webhook = "https://mywebhookssite.com/post/", start = "2019-01-01", end = "2019-01-31", region = ["us", "global"])
 ```
 
 Run your program. 
@@ -70,22 +70,23 @@ For all the charts provided by Spotify, four functions exist:
 All four functions take the following parameters:
 #### Ouput options
 1. output_file - CSV file to write the data to (Compulsory for fycharts<3.0.0)
-2. output_db - A connector object for any database supported by SQLAlchemy (only for fycharts>=3.0.0)
+2. output_db - A connector object for any database supported by SQLAlchemy (only available in fycharts>=3.0.0)
+3. webhook - A http endpoint (or list of endpoints) to POST the extracted data to (only available in fycharts>=3.0.0)
+
+    *Create a webhooks for testing here: https://webhook.site/ or here: https://beeceptor.com/*
 
 #### Parameters
 1. start - Start date of range of interest as string with the format YYYY-MM-DD
 2. end - End date of range of interest as string with the format YYYY-MM-DD
-3. region - Region of interest, as a country abbreviation code. 'global' is also valid
+3. region - Region (or a list of regions e.g. ["global", "us", "fr"]) of interest, as a country abbreviation code. "global" is also valid
 
-    *region can also be a list of regions e.g. ["global", "us", "fr"]*
-
-    **Refer to [SUPPORTED COUNTRY CODES SO FAR](#codes) below for supported regions.**
+    *Refer to [SUPPORTED COUNTRY CODES SO FAR](#codes) below for supported regions.*
 
 If not included, data is extracted for all dates, all regions
 
 ## DATA RETURNED  <a id= "format"></a>
 The data extracted from spotifycharts.com is written to the output (usually a CSV file) with the following fields:
-1. position - The song's position during that week or day
+1. position - The song"s position during that week or day
 2. track name - Name of the song
 3. artist - Name of artist
 4. streams - Number of streams for that week or day. **Only applicable to top 200 charts**
@@ -108,6 +109,32 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
     3. top200Daily to the table ```top_200_daily```
     4. top200Weekly to the table ```top_200_weekly```
 
+**Note:** To REST endpoints, a list of objects is POSTED in the form:
+```bash
+[
+    {
+        "position": 1,
+        "track name": "xxx",
+        "artist": "xxxx",
+        "streams": 789456,
+        "region": "global",
+        "date": "YYYY-MM-DD--YYYY-MM-DD",
+        "id": "xx"
+
+    },
+    {
+        "position": 2,
+        "track name": "xxx",
+        "artist": "xxxx",
+        "streams": 7845,
+        "region": "global",
+        "date": "YYYY-MM-DD--YYYY-MM-DD",
+        "id": "xx"
+
+    }
+]
+```
+
 ## SUPPORTED COUNTRY CODES SO FAR  <a id= "codes"></a>
 |   |   |   |   |   |   |   |   |
 |---|---|---|---|---|---|---|---|
@@ -121,7 +148,7 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
 |br |de |gb |il |mt |pe |sk |global|
 
 ## ABOUT DATES <a id = "dates"></a>
-The start date of the range you're interested in, is very specific for each chart. If you enter an invalid date, you'll be prompted with a list of suggestions and given a choice whether to use fycharts' suggestion or your own.
+The start date of the range you"re interested in, is very specific for each chart. If you enter an invalid date, you"ll be prompted with a list of suggestions and given a choice whether to use fycharts" suggestion or your own.
 
 *If using multithreading to run multiple functions, the prompt comes up but is non-blocking. However, you can still respond*
 
@@ -132,18 +159,19 @@ To fully take advantage of multithreading, you may write your code as follows:
 ```python
 myCrawler.py
 
-
+import sqlalchemy
 import threading
 
 from fycharts.SpotifyCharts import SpotifyCharts
 
 def main():
     api = SpotifyCharts()
+    connector = sqlalchemy.create_engine("sqlite:///spotifycharts.db", echo=False)
 
-    a_thread = threading.Thread(target = api.top200Daily, args = ("top_200_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
-    b_thread = threading.Thread(target = api.top200Weekly, args = ("top_200_weekly.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
-    c_thread = threading.Thread(target = api.viral50Daily, args = ("viral_50_daily.csv",), kwargs = {"start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
-    d_thread = threading.Thread(target = api.viral50Weekly, args = ("viral_50_weekly.csv",), kwargs = {"start": "2020-01-02", "end":"2020-01-12", "region": ["global", "us"]})
+    a_thread = threading.Thread(target = api.top200Daily, kwargs = {"output_file": "top_200_daily.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    b_thread = threading.Thread(target = api.top200Weekly, kwargs = {"output_file": "top_200_weekly.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    c_thread = threading.Thread(target = api.viral50Daily, kwargs = {"output_file": "viral_50_daily.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    d_thread = threading.Thread(target = api.viral50Weekly, kwargs = {"output_file": "viral_50_weekly.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-02", "end":"2020-01-12", "region": ["global", "us"]})
     
     a_thread.start()
     b_thread.start()
@@ -176,6 +204,17 @@ This function prints a list of valid dates for the kind of data you are interest
             * viral50Weekly
 
 ## CHANGELOG <a id = "change"></a>
+### 3.0.0 Yet to be released
+**Added**
+* Accepting a DB connector to write data to db
+* Accepting a list of REST endpoints to post data to  
+
+**Fixed**
+* A bug in file validation
+
+**Changed**
+* The Spotify track id column name from 'id' to 'spotify_id'
+
 ### 2.0.1 31st Jan 2020
 **Fixed**
 * A bug in setting the column titles when multiple regions are requested
@@ -197,4 +236,4 @@ This function prints a list of valid dates for the kind of data you are interest
 * Renamed the project to fycharts
 
 ### 1.0.0 26th Dec 2018
-* Released project named 'Spotify-Charts-API'
+* Released project named "Spotify-Charts-API"

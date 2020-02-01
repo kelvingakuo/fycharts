@@ -10,10 +10,13 @@ def writeToCSV(j, output_file, df):
 	else:
 		isHeaders = False
 
-	with open(output_file, 'a', encoding='utf-8') as out:
-		logger.info(f"Appending data to the file {output_file}...")
-		df.to_csv(out, index = False, header = isHeaders, encoding = 'utf-8')
-		logger.info(f"Done appending to the file {output_file}!!!")
+	try:
+		with open(output_file, 'a', encoding='utf-8') as out:
+			logger.info(f"Appending data to the file {output_file}...")
+			df.to_csv(out, index = False, header = isHeaders, encoding = 'utf-8')
+			logger.info(f"Done appending to the file {output_file}!!!")
+	except Exception as e:
+		raise(e)
 
 
 def writeToSQLTable(which_data, connector, df):
@@ -28,11 +31,23 @@ def writeToSQLTable(which_data, connector, df):
 	elif(which_data == "viral50Weekly"):
 		table = "viral_50_weekly"
 
-	logger.info(f"Appending data to the table {table}")
-	df.to_sql(table, con = connector, if_exists = "append")
-	logger.info(f"Done appending to the table {table}!!!")
+	try:
+		logger.info(f"Appending data to the table {table}")
+		df.to_sql(table, con = connector, if_exists = "append")
+		logger.info(f"Done appending to the table {table}!!!")
+	except Exception as e:
+		raise(e)
 
 
 
-def postToRestEndpoint():
-	pass
+def postToRestEndpoint(df, urls):
+	""" Convert df to json, then post to endpoint
+	"""
+	dump = df.to_json(orient = "records")
+	try:
+		for url in urls:
+			logger.info(f"POSTing data to the endpoint {url}")
+			requests.post(url, data = dump)
+			logger.info("Done POSTing")
+	except Exception as e:
+		raise(e)
