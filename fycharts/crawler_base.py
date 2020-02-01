@@ -88,7 +88,7 @@ class SpotifyChartsBase(object):
 
 						df["date"] = date
 						df["region"] = region
-						df["id"] =  df["URL"].apply(lambda x: self.__regex(x))
+						df["spotify_id"] =  df["URL"].apply(lambda x: self.__regex(x))
 						df.drop(["URL"], axis=1, inplace=True)
 
 

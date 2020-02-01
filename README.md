@@ -21,6 +21,16 @@ This was built to fill the gap left when Spotify deprecated their official Spoti
 ```bash
 pip install fycharts
 ```
+
+or clone this repo to use the most up-to-date functionality
+
+```bash
+virtualenv an_env && cd an_env
+source bin/activate
+git clone https://github.com/kelvingakuo/fycharts
+pip install fycharts/
+```
+
 ## SAMPLE USAGE <a id="sample"></a>
 Say you want to extract top 200 daily charts for all time, all regions
 ```python
@@ -31,6 +41,19 @@ from fycharts.SpotifyCharts import SpotifyCharts
 api = SpotifyCharts()
 api.top200Daily(output_file = 'top_200_daily.csv')
 ```
+
+Or you want viral 50 daily charts for January 2019 in the us and globally, to be written into a csv file and a SQLLite db *Note: This works only for fycharts>=3.0.0*
+```python
+myCrawler.py
+
+from fycharts.SpotifyCharts import SpotifyCharts
+import sqlalchemy
+
+api = SpotifyCharts()
+connector = sqlalchemy.create_engine('sqlite:///spotifycharts.db', echo=False)
+api.viral50Daily(output_file = "viral_50_daily.csv", output_db = connector, start = "2019-01-01", end = "2019-01-31", region = ["us", "global"])
+```
+
 Run your program. 
 ```bash
 python myCrawler.py
@@ -45,19 +68,18 @@ For all the charts provided by Spotify, four functions exist:
 4. viral50Daily
 
 All four functions take the following parameters:
-#### Compulsory
-1. output_file - CSV file to dump the data. 
+#### Ouput options
+1. output_file - CSV file to write the data to (Compulsory for fycharts<3.0.0)
+2. output_db - A connector object for any database supported by SQLAlchemy (only for fycharts>=3.0.0)
 
-*For V3.0.0 more outputs e.g. SQL db, REST endpoint etc. will be available. Stay tuned*
-
-#### Optional
+#### Parameters
 1. start - Start date of range of interest as string with the format YYYY-MM-DD
 2. end - End date of range of interest as string with the format YYYY-MM-DD
 3. region - Region of interest, as a country abbreviation code. 'global' is also valid
 
-    **region can also be a list of regions e.g. ["global", "us", "fr"]**
+    *region can also be a list of regions e.g. ["global", "us", "fr"]*
 
-    **Refer to [SUPPORTED COUNTRY CODES SO FAR](#codes) below for accepted regions.**
+    **Refer to [SUPPORTED COUNTRY CODES SO FAR](#codes) below for supported regions.**
 
 If not included, data is extracted for all dates, all regions
 
@@ -66,10 +88,25 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
 1. position - The song's position during that week or day
 2. track name - Name of the song
 3. artist - Name of artist
-4. region - Region of the chart as a code
-5. date - Date or range of dates of chart
-6. spotify_id - Spotify track id
-7. streams - Number of streams for that week or day. **Only applicable to top 200 charts**
+4. streams - Number of streams for that week or day. **Only applicable to top 200 charts**
+5. region - Region of the chart as a code
+6. date - This varies
+
+    For instance if you set start = 2020-01-03 & end = 2020-01-15 
+
+    For daily charts -> YYYY-MM-DD e.g 2020-01-03
+
+    For top 200 weekly chart -> week_start_date--week_end_date e.g 2020-01-03--2020-01-10
+
+    For viral 50 weekly chart -> week_start_date--week_start_date e.g 2020-01-03--2020-01-03
+
+7. id - Spotify track id
+
+**Note:** When writing to a db, fycharts is setup to write:
+    1. viral50Daily to the table ```viral_50_daily```
+    2. viral50Weekly to the table ```viral_50_weekly```
+    3. top200Daily to the table ```top_200_daily```
+    4. top200Weekly to the table ```top_200_weekly```
 
 ## SUPPORTED COUNTRY CODES SO FAR  <a id= "codes"></a>
 |   |   |   |   |   |   |   |   |
