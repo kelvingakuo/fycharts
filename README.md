@@ -138,15 +138,11 @@ This function prints a list of valid dates for the kind of data you are interest
             * viral50Daily
             * viral50Weekly
 
-
-
-
-
-
 ## CHANGELOG <a id = "change"></a>
 ### 2.0.1 31st Jan 2020
 **Fixed**
 * A bug in setting the column titles when multiple regions are requested
+
 ### 2.0.0 30th Jan 2020
 **Added**
 * Multithreading to increase crawling speeds
@@ -156,9 +152,12 @@ This function prints a list of valid dates for the kind of data you are interest
 
 **Improved**
 * The documentation
+
 ### 1.2.0 5th April 2019
 * Improved date verification
+
 ### 1.0.1 5th Jan 2019
 * Renamed the project to fycharts
+
 ### 1.0.0 26th Dec 2018
 * Released project named 'Spotify-Charts-API'

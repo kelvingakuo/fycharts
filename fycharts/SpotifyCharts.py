@@ -8,15 +8,15 @@ from .compute_dates import returnDatesAndRegions
 from .compute_dates import whatDates
 from .log_config import logger
 from .write_to_outputs import writeToCSV
+from .write_to_outputs import writeToSQLTable
 
 from .exceptions import FyChartsException
 
 
 
 def validateFile(fileName):
-	if("csv" in fileName):
+	if(".csv" in fileName):
 			file = fileName
-
 			return file
 	else:
 		raise FyChartsException("ONLY CSV FILES ALLOWED!!!")
@@ -27,10 +27,8 @@ def validateFile(fileName):
 class SpotifyCharts(SpotifyChartsBase):
 	def __init__(self):
 		SpotifyChartsBase.__init__(self)
-		self.data_queue = Queue()
-
-		# self.thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
-		# self.thread.start()
+		self.csv_data_queue = Queue()
+		self.db_data_queue = Queue()
 
 	def __write_to_csv_from_queue(self, data_q):
 		""" Reads a dataframe from the queue, then writes to CSV
@@ -52,14 +50,29 @@ class SpotifyCharts(SpotifyChartsBase):
 			raise RuntimeError(e)
 
 	def __write_to_db_from_queue(self, data_q):
-		""" TODO: Reads a dataframe from the queue, then writes to SQL table
+		""" Reads a dataframe from the queue, then writes to SQL table
 		"""
-		pass
+		try:
+			work = True
+			while work:
+				data = data_q.get(block = True)
+				if data is None:
+					work = False
+					return
+				else:
+					df = data["df"]
+					conn = data["conn"]
+					data_type = data["data_type"]
+
+					writeToSQLTable(data_type, conn, df)
+		except Exception as e:
+			raise RuntimeError(e)
 
 	def top200Weekly(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 weekly
 		Params:
-			output_file - CSV file to write the data to
+			output_file - Name of CSV file to write the data to
+			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects)
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
@@ -73,11 +86,14 @@ class SpotifyCharts(SpotifyChartsBase):
 		regions = data["region"]
 
 		if(output_file is not None):
-			a_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			a_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			a_thread.start()
 		if(output_db is not None):
-			adb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			adb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			adb_thread.start()
+
+		if(output_file is None and output_db is None):
+			raise FyChartsException("Please provide at least one output destination")
 
 		j = 0
 		while(j < len(dates)):
@@ -88,16 +104,23 @@ class SpotifyCharts(SpotifyChartsBase):
 			k = j
 			for region in regions:
 				df = super().helperTop200Weekly(theRange, region)
-				dict_for_thread = {"df": df, "out_file": file, "j": k}
-				self.data_queue.put(dict_for_thread)
+				if(output_file is not None):
+					dict_for_csv = {"df": df, "out_file": file, "j": k}
+					self.csv_data_queue.put(dict_for_csv)
+				if(output_db is not None):
+					dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Weekly"}
+					self.db_data_queue.put(dict_for_db)
+
 				k = k + 1
 			j = j + 1
-		self.data_queue.put(None)
+		self.csv_data_queue.put(None)
+		self.db_data_queue.put(None)
 
 	def top200Daily(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 daily
 		Params:
-			output_file - CSV file to write the data to
+			output_file - Name of CSV file to write the data to
+			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
@@ -111,11 +134,14 @@ class SpotifyCharts(SpotifyChartsBase):
 		regions = data["region"]
 
 		if(output_file is not None):
-			b_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			b_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			b_thread.start()
 		if(output_db is not None):
-			bdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			bdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			bdb_thread.start()
+
+		if(output_file is None and output_db is None):
+			raise FyChartsException("Please provide at least one output destination")
 
 		j = 0
 		while(j < len(dates)):
@@ -124,17 +150,23 @@ class SpotifyCharts(SpotifyChartsBase):
 			k = j
 			for region in regions:
 				df = super().helperTop200Daily(theRange, region)
-				dict_for_thread = {"df": df, "out_file": file, "j": k}
-				self.data_queue.put(dict_for_thread)
+				if(output_file is not None):
+					dict_for_csv = {"df": df, "out_file": file, "j": k}
+					self.csv_data_queue.put(dict_for_csv)
+				if(output_db is not None):
+					dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Daily"}
+					self.db_data_queue.put(dict_for_db)
 				k = k + 1
 
 			j = j + 1
-		self.data_queue.put(None)
+		self.csv_data_queue.put(None)
+		self.db_data_queue.put(None)
 
 	def viral50Weekly(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 weekly
 		Params:
-			output_file - CSV file to write the data to
+			output_file - Name of CSV file to write the data to
+			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
@@ -148,11 +180,14 @@ class SpotifyCharts(SpotifyChartsBase):
 		regions = data["region"]
 
 		if(output_file is not None):
-			c_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			c_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			c_thread.start()
 		if(output_db is not None):
-			cdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			cdb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			cdb_thread.start()
+
+		if(output_file is None and output_db is None):
+			raise FyChartsException("Please provide at least one output destination")
 
 		j = 0
 		while(j < len(dates)):
@@ -163,17 +198,23 @@ class SpotifyCharts(SpotifyChartsBase):
 			k = j
 			for region in regions:
 				df = super().helperViral50Weekly(theRange, region)
-				dict_for_thread = {"df": df, "out_file": file, "j": k}
-				self.data_queue.put(dict_for_thread)
+				if(output_file is not None):
+					dict_for_csv = {"df": df, "out_file": file, "j": k}
+					self.csv_data_queue.put(dict_for_csv)
+				if(output_db is not None):
+					dict_for_db = {"df": df, "conn": output_db, "data_type": "viral50Weekly"}
+					self.db_data_queue.put(dict_for_db)
 				k = k + 1
 
 			j = j + 1
-		self.data_queue.put(None)
+		self.csv_data_queue.put(None)
+		self.db_data_queue.put(None)
 
 	def viral50Daily(self, output_file = None, output_db = None, start = None, end = None, region = None):
 		"""Write to file the charts data for viral 50 daily
 		Params:
-			output_file - CSV file to write the data to
+			output_file - Name of CSV file to write the data to
+			output_db - A connection object to any database supported by SQLAlchemy (https://docs.sqlalchemy.org/en/13/dialects/#included-dialects
 			start - Start of range (YYYY-MM-DD) as string
 			end - End of range (YYYY-MM-DD) as string
 			region - Region (or a list of regions) to get data for
@@ -187,11 +228,14 @@ class SpotifyCharts(SpotifyChartsBase):
 		regions = data["region"]
 
 		if(output_file is not None):
-			d_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.data_queue,))
+			d_thread = threading.Thread(target = self.__write_to_csv_from_queue, args = (self.csv_data_queue,))
 			d_thread.start()
 		if(output_db is not None):
-			ddb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.data_queue,))
+			ddb_thread = threading.Thread(target = self.__write_to_db_from_queue, args = (self.db_data_queue,))
 			ddb_thread.start()
+
+		if(output_file is None and output_db is None):
+			raise FyChartsException("Please provide at least one output destination")
 
 		j = 0
 		while(j < len(dates)):
@@ -200,12 +244,18 @@ class SpotifyCharts(SpotifyChartsBase):
 			k = j
 			for region in regions:
 				df = super().helperViral50Daily(theRange, region)
-				dict_for_thread = {"df": df, "out_file": file, "j": k}
-				self.data_queue.put(dict_for_thread)
+				if(output_file is not None):
+					dict_for_csv = {"df": df, "out_file": file, "j": k}
+					self.csv_data_queue.put(dict_for_csv)
+				if(output_db is not None):
+					dict_for_db = {"df": df, "conn": output_db, "data_type": "viral50Daily"}
+					self.db_data_queue.put(dict_for_db)
+
 				k = k + 1
 
 			j = j + 1
-		self.data_queue.put(None)
+		self.csv_data_queue.put(None)
+		self.db_data_queue.put(None)
 
 	# ====== UTILITY FUNCTIONS ======
 	def validDates(self, start, end, desired):
