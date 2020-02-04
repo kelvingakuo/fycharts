@@ -40,14 +40,15 @@ def writeToSQLTable(which_data, connector, df):
 
 
 
-def postToRestEndpoint(df, urls):
+def postToRestEndpoint(df, urls, which):
 	""" Convert df to json, then post to endpoint
 	"""
-	dump = df.to_json(orient = "records")
+	fd = df.to_dict(orient = "records")
+	dump = {"chart": which, "data": fd}
 	try:
 		for url in urls:
 			logger.info(f"POSTing data to the endpoint {url}")
-			requests.post(url, data = dump)
+			requests.post(url, json = dump)
 			logger.info("Done POSTing")
 	except Exception as e:
 		raise(e)

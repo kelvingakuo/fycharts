@@ -82,8 +82,9 @@ class SpotifyCharts(SpotifyChartsBase):
 				else:
 					df = data["df"]
 					url = data["url"]
+					what_data = data["which_one"]
 
-					postToRestEndpoint(df, url)
+					postToRestEndpoint(df, url, what_data)
 		except Exception as e:
 			raise RuntimeError(e)
 
@@ -134,7 +135,7 @@ class SpotifyCharts(SpotifyChartsBase):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Weekly"}
 					self.db_data_queue.put(dict_for_db)
 				if(webhook is not None):
-					dict_for_hook = {"df": df, "url": webhook}
+					dict_for_hook = {"df": df, "url": webhook, "which_one": "top_200_weekly"}
 					self.post_data_queue.put(dict_for_hook)
 
 				k = k + 1
@@ -189,7 +190,7 @@ class SpotifyCharts(SpotifyChartsBase):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Daily"}
 					self.db_data_queue.put(dict_for_db)
 				if(webhook is not None):
-					dict_for_hook = {"df": df, "url": webhook}
+					dict_for_hook = {"df": df, "url": webhook, "which_one": "top_200_daily"}
 					self.post_data_queue.put(dict_for_hook)
 				k = k + 1
 
@@ -246,7 +247,7 @@ class SpotifyCharts(SpotifyChartsBase):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "viral50Weekly"}
 					self.db_data_queue.put(dict_for_db)
 				if(webhook is not None):
-					dict_for_hook = {"df": df, "url": webhook}
+					dict_for_hook = {"df": df, "url": webhook, "which_one": "viral_50_weekly"}
 					self.post_data_queue.put(dict_for_hook)
 				k = k + 1
 
@@ -301,7 +302,7 @@ class SpotifyCharts(SpotifyChartsBase):
 					dict_for_db = {"df": df, "conn": output_db, "data_type": "viral50Daily"}
 					self.db_data_queue.put(dict_for_db)
 				if(webhook is not None):
-					dict_for_hook = {"df": df, "url": webhook}
+					dict_for_hook = {"df": df, "url": webhook, "which_one": "viral_50_daily"}
 					self.post_data_queue.put(dict_for_hook)
 
 				k = k + 1

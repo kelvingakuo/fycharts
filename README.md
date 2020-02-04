@@ -77,12 +77,11 @@ If not specified, data is extracted for all dates, all regions
 
 ## DATA RETURNED  <a id= "format"></a>
 The data extracted from spotifycharts.com is written to the output with the following fields:
-1. position - The song's position during that week or day
-2. track name - Name of the song
-3. artist - Name of artist
-4. streams - Number of streams for that week or day. **Only applicable to top 200 charts**
-5. region - Region of the chart as a code
-6. date - This varies
+1. Position - The song's position during that week or day
+2. Track Name - Name of the song
+3. Artist - Name of artist
+4. Streams - Number of streams for that week or day. **Only applicable to top 200 charts**
+5. date - This varies
 
     For instance if you set 'start = 2020-01-03' & 'end = 2020-01-15'
 
@@ -92,6 +91,8 @@ The data extracted from spotifycharts.com is written to the output with the foll
 
     For viral 50 weekly chart -> week_start_date--week_start_date e.g 2020-01-03--2020-01-03
 
+6. region - Region of the chart as a code
+
 7. spotify_id - Spotify track id ('id' for fycharts < 3.0.0)
 
 **Note:** When writing to a db, fycharts is setup to write:
@@ -100,30 +101,31 @@ The data extracted from spotifycharts.com is written to the output with the foll
     3. top200Daily to the table ```top_200_daily```
     4. top200Weekly to the table ```top_200_weekly```
 
-**Note:** To REST endpoints, a list of objects is POSTED in the form:
+**Note:** To REST endpoints, a JSON payload is sent with the structure:
 ```bash
-[
+{
+  "chart": "top_200_daily",
+  "data": [
     {
-        "position": 1,
-        "track name": "xxx",
-        "artist": "xxxx",
-        "streams": 7846,
-        "region": "global",
-        "date": "YYYY-MM-DD",
-        "spotify_id": "xx"
-
+      "Position": 1,
+      "Track Name": "The Box",
+      "Artist": "Roddy Ricch",
+      "Streams": 2278155,
+      "date": "2020-01-03",
+      "region": "us",
+      "spotify_id": "0nbXyq5TXYPCO7pr3N8S4I"
     },
     {
-        "position": 2,
-        "track name": "xxx",
-        "artist": "xxxx",
-        "streams": 7845,
-        "region": "global",
-        "date": "YYYY-MM-DD",
-        "spotify_id": "xx"
-
-    }
-]
+      "Position": 2,
+      "Track Name": "Yummy",
+      "Artist": "Justin Bieber",
+      "Streams": 1863557,
+      "date": "2020-01-03",
+      "region": "us",
+      "spotify_id": "41L3O37CECZt3N7ziG2z7l"
+    },
+  ]
+}
 ```
 
 ## SUPPORTED COUNTRY CODES SO FAR  <a id= "codes"></a>
@@ -196,6 +198,11 @@ This function prints a list of valid dates for the kind of data you are interest
             * viral50Weekly
 
 ## CHANGELOG <a id = "change"></a>
+*This changelog follows a loose version of semantic versioning*
+### 3.1.0 4th Feb 2020
+**Added**
+* Identifying info to payload POSTed to webhook
+
 ### 3.0.0 4th Feb 2020
 **Added**
 * Accepting a DB connector to write data to db
