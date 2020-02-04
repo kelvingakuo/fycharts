@@ -11,9 +11,9 @@ def writeToCSV(j, output_file, df):
 		isHeaders = False
 
 	try:
-		with open(output_file, 'a', encoding='utf-8') as out:
+		with open(output_file, 'a', encoding="utf-8") as out:
 			logger.info(f"Appending data to the file {output_file}...")
-			df.to_csv(out, index = False, header = isHeaders, encoding = 'utf-8')
+			df.to_csv(out, index = False, header = isHeaders, encoding = "utf-8")
 			logger.info(f"Done appending to the file {output_file}!!!")
 	except Exception as e:
 		raise(e)

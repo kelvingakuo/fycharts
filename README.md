@@ -22,15 +22,6 @@ This was built to fill the gap left when Spotify deprecated their official Spoti
 pip install fycharts
 ```
 
-or clone this repo to use the most up-to-date functionality
-
-```bash
-virtualenv an_env && cd an_env
-source bin/activate
-git clone https://github.com/kelvingakuo/fycharts
-pip install fycharts/
-```
-
 ## SAMPLE USAGE <a id="sample"></a>
 Say you want to extract top 200 daily charts for all time, all regions
 ```python
@@ -62,10 +53,10 @@ Watch the terminal for helpful information.
 
 ## FUNCTIONS AND PARAMETERS <a id= "funcs"></a>
 For all the charts provided by Spotify, four functions exist:
-1. top200Weekly
-2. top200Daily
-3. viral50Weekly
-4. viral50Daily
+1. top200Weekly()
+2. top200Daily()
+3. viral50Weekly()
+4. viral50Daily()
 
 All four functions take the following parameters:
 #### Ouput options
@@ -73,27 +64,27 @@ All four functions take the following parameters:
 2. output_db - A connector object for any database supported by SQLAlchemy (only available in fycharts>=3.0.0)
 3. webhook - A http endpoint (or list of endpoints) to POST the extracted data to (only available in fycharts>=3.0.0)
 
-    *Create a webhooks for testing here: https://webhook.site/ or here: https://beeceptor.com/*
+    *Create webhooks for testing here: https://webhook.site/ or here: https://beeceptor.com/*
 
-#### Parameters
+#### Parameters (Optional)
 1. start - Start date of range of interest as string with the format YYYY-MM-DD
 2. end - End date of range of interest as string with the format YYYY-MM-DD
 3. region - Region (or a list of regions e.g. ["global", "us", "fr"]) of interest, as a country abbreviation code. "global" is also valid
 
     *Refer to [SUPPORTED COUNTRY CODES SO FAR](#codes) below for supported regions.*
 
-If not included, data is extracted for all dates, all regions
+If not specified, data is extracted for all dates, all regions
 
 ## DATA RETURNED  <a id= "format"></a>
-The data extracted from spotifycharts.com is written to the output (usually a CSV file) with the following fields:
-1. position - The song"s position during that week or day
+The data extracted from spotifycharts.com is written to the output with the following fields:
+1. position - The song's position during that week or day
 2. track name - Name of the song
 3. artist - Name of artist
 4. streams - Number of streams for that week or day. **Only applicable to top 200 charts**
 5. region - Region of the chart as a code
 6. date - This varies
 
-    For instance if you set start = 2020-01-03 & end = 2020-01-15 
+    For instance if you set 'start = 2020-01-03' & 'end = 2020-01-15'
 
     For daily charts -> YYYY-MM-DD e.g 2020-01-03
 
@@ -101,7 +92,7 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
 
     For viral 50 weekly chart -> week_start_date--week_start_date e.g 2020-01-03--2020-01-03
 
-7. id - Spotify track id
+7. spotify_id - Spotify track id ('id' for fycharts < 3.0.0)
 
 **Note:** When writing to a db, fycharts is setup to write:
     1. viral50Daily to the table ```viral_50_daily```
@@ -116,10 +107,10 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
         "position": 1,
         "track name": "xxx",
         "artist": "xxxx",
-        "streams": 789456,
+        "streams": 7846,
         "region": "global",
-        "date": "YYYY-MM-DD--YYYY-MM-DD",
-        "id": "xx"
+        "date": "YYYY-MM-DD",
+        "spotify_id": "xx"
 
     },
     {
@@ -128,8 +119,8 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
         "artist": "xxxx",
         "streams": 7845,
         "region": "global",
-        "date": "YYYY-MM-DD--YYYY-MM-DD",
-        "id": "xx"
+        "date": "YYYY-MM-DD",
+        "spotify_id": "xx"
 
     }
 ]
@@ -148,9 +139,9 @@ The data extracted from spotifycharts.com is written to the output (usually a CS
 |br |de |gb |il |mt |pe |sk |global|
 
 ## ABOUT DATES <a id = "dates"></a>
-The start date of the range you"re interested in, is very specific for each chart. If you enter an invalid date, you"ll be prompted with a list of suggestions and given a choice whether to use fycharts" suggestion or your own.
+The start date of the range you"re interested in, is very specific for each chart. If you enter an invalid date, you'll be prompted with a list of suggestions and given a choice whether to use fycharts' suggestion or your own.
 
-*If using multithreading to run multiple functions, the prompt comes up but is non-blocking. However, you can still respond*
+*If using multithreading to run multiple functions, the prompt comes up but is non-blocking. You can still respond*
 
 ## A RECIPE ON STERIODS  <a id= "turbo"></a>
 
@@ -167,11 +158,12 @@ from fycharts.SpotifyCharts import SpotifyCharts
 def main():
     api = SpotifyCharts()
     connector = sqlalchemy.create_engine("sqlite:///spotifycharts.db", echo=False)
+    hooks = ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"]
 
-    a_thread = threading.Thread(target = api.top200Daily, kwargs = {"output_file": "top_200_daily.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
-    b_thread = threading.Thread(target = api.top200Weekly, kwargs = {"output_file": "top_200_weekly.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
-    c_thread = threading.Thread(target = api.viral50Daily, kwargs = {"output_file": "viral_50_daily.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
-    d_thread = threading.Thread(target = api.viral50Weekly, kwargs = {"output_file": "viral_50_weekly.csv", "output_db": connector, "webhook": ["https://mywebhookssite.com/post/", "http://asecondsite.net/post"], "start": "2020-01-02", "end":"2020-01-12", "region": ["global", "us"]})
+    a_thread = threading.Thread(target = api.top200Daily, kwargs = {"output_file": "top_200_daily.csv", "output_db": connector, "webhook": hooks, "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    b_thread = threading.Thread(target = api.top200Weekly, kwargs = {"output_file": "top_200_weekly.csv", "output_db": connector, "webhook": hooks, "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    c_thread = threading.Thread(target = api.viral50Daily, kwargs = {"output_file": "viral_50_daily.csv", "output_db": connector, "webhook": hooks, "start": "2020-01-03", "end":"2020-01-12", "region": ["global", "us"]})
+    d_thread = threading.Thread(target = api.viral50Weekly, kwargs = {"output_file": "viral_50_weekly.csv", "output_db": connector, "webhook": hooks, "start": "2020-01-02", "end":"2020-01-12", "region": ["global", "us"]})
     
     a_thread.start()
     b_thread.start()
@@ -183,7 +175,7 @@ if __name__ == "__main__":
     main()
 ```
 
-**TAKE NOTE:** DO NOT SHARE THE OUTPUT DESTINATION ACROSS THE FUNCTIONS i.e. each function should be writing to its own set of outputs
+**TAKE NOTE:** **DO NOT** SHARE THE OUTPUT DESTINATION ACROSS THE FUNCTIONS i.e. each function should be writing to its own set of outputs
 
 ## UTILITY FUNCTIONS <a id = "utils"></a>
 This library exposes some functions that you may find of use:
@@ -204,7 +196,7 @@ This function prints a list of valid dates for the kind of data you are interest
             * viral50Weekly
 
 ## CHANGELOG <a id = "change"></a>
-### 3.0.0 Yet to be released
+### 3.0.0 4th Feb 2020
 **Added**
 * Accepting a DB connector to write data to db
 * Accepting a list of REST endpoints to post data to  
