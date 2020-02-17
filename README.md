@@ -198,7 +198,7 @@ This function prints a list of valid dates for the kind of data you are interest
             * viral50Weekly
 
 ## CHANGELOG <a id = "change"></a>
-*This changelog follows a loose version of semantic versioning*
+*This changelog loosely follows semantic versioning*
 ### 3.1.0 4th Feb 2020
 **Added**
 * Identifying info to payload POSTed to webhook
