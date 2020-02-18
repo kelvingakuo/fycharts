@@ -96,10 +96,14 @@ The data extracted from spotifycharts.com is written to the output with the foll
 7. spotify_id - Spotify track id ('id' for fycharts < 3.0.0)
 
 **Note:** When writing to a db, fycharts is setup to write:
-    1. viral50Daily to the table ```viral_50_daily```
-    2. viral50Weekly to the table ```viral_50_weekly```
-    3. top200Daily to the table ```top_200_daily```
-    4. top200Weekly to the table ```top_200_weekly```
+
+    1. viral50Daily to the table `viral_50_daily`
+
+    2. viral50Weekly to the table `viral_50_weekly`
+
+    3. top200Daily to the table `top_200_daily`
+
+    4. top200Weekly to the table `top_200_weekly`
 
 **Note:** To REST endpoints, a JSON payload is sent with the structure:
 ```bash
@@ -141,7 +145,7 @@ The data extracted from spotifycharts.com is written to the output with the foll
 |br |de |gb |il |mt |pe |sk |global|
 
 ## ABOUT DATES <a id = "dates"></a>
-The start date of the range you"re interested in, is very specific for each chart. If you enter an invalid date, you'll be prompted with a list of suggestions and given a choice whether to use fycharts' suggestion or your own.
+The start date of the range you're interested in, is very specific for each chart. If you enter an invalid date, you'll be prompted with a list of suggestions and given a choice whether to use fycharts' suggestion or your own.
 
 *If using multithreading to run multiple functions, the prompt comes up but is non-blocking. You can still respond*
 
