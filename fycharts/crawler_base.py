@@ -71,7 +71,7 @@ class SpotifyChartsBase(object):
 			try:
 				s = requests.Session()
 				s.mount("https://", HTTPAdapter(max_retries = retries))
-				res = s.get(url, headers = headers)
+				res = s.get(url, headers = headers, timeout = 3)
 
 				if(res.status_code == 200):
 					if(res.headers["Content-Type"] == "text/html; charset=UTF-8"):
