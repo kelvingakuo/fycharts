@@ -42,7 +42,7 @@ import sqlalchemy
 
 api = SpotifyCharts()
 connector = sqlalchemy.create_engine("sqlite:///spotifycharts.db", echo=False)
-api.viral50Daily(output_file = "viral_50_daily.csv", output_db = connector, webhook = "https://mywebhookssite.com/post/", start = "2019-01-01", end = "2019-01-31", region = ["us", "global"])
+api.viral50Daily(output_file = "viral_50_daily.csv", output_db = connector, webhook = ["https://mywebhookssite.com/post/"], start = "2019-01-01", end = "2019-01-31", region = ["us", "global"])
 ```
 
 Run your program. 
@@ -62,7 +62,7 @@ All four functions take the following parameters:
 #### Ouput options
 1. output_file - CSV file to write the data to (Compulsory for fycharts<3.0.0)
 2. output_db - A connector object for any database supported by SQLAlchemy (only available in fycharts>=3.0.0)
-3. webhook - A http endpoint (or list of endpoints) to POST the extracted data to (only available in fycharts>=3.0.0)
+3. webhook - A list of HTTP endpoints to POST the extracted data to (only available in fycharts>=3.0.0)
 
     *Create webhooks for testing here: https://webhook.site/ or here: https://beeceptor.com/*
 
