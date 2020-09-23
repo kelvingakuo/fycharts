@@ -240,3 +240,8 @@ This function prints a list of valid dates for the kind of data you are interest
 
 ### 1.0.0 26th Dec 2018
 * Released project named "Spotify-Charts-API"
+
+
+## PLAN
+1. Implement CLI version
+2. Release V4.0.0
