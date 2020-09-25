@@ -21,6 +21,10 @@ This was built to fill the gap left when Spotify deprecated their official Spoti
 ```bash
 pip install fycharts
 ```
+## API
+
+## CLI
+CLI only available for fycharts>=4.0.0
 
 ## SAMPLE USAGE <a id="sample"></a>
 Say you want to extract top 200 daily charts for all time, all regions

@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="fycharts",
-    version="3.1.0",
+    version="4.0.0",
     author="Kelvin Gakuo",
     author_email="kelvingakuo@gmail.com",
     description="A fully-fledged installable python package for extracting top 200 and viral 50 charts off of spotifycharts.com",
@@ -22,4 +22,8 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    entry_points = """
+		[console_scripts]
+		fycharts=cli:main
+	"""
 )
