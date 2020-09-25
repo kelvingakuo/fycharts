@@ -24,6 +24,6 @@ setuptools.setup(
     ],
     entry_points = """
 		[console_scripts]
-		fycharts=cli:main
+		fycharts=fycharts.cli:main
 	"""
 )
