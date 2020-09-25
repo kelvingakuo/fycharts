@@ -14,8 +14,10 @@ setuptools.setup(
     url="https://github.com/kelvingakuo/fycharts",
     packages=setuptools.find_packages(),
     install_requires=[
-        "pandas",
-        "requests"
+        "pandas==1.1.2",
+        "requests==2.24.0",
+        "click==7.1.2",
+        "colorama==0.4.3"
     ],
     classifiers=[
         "Programming Language :: Python :: 3.5",
