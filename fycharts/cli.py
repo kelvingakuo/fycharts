@@ -35,22 +35,21 @@ def main(chart, start, end, csv, region, webhook):
 		if(chart == "top200Weekly"):
 			click.secho("Extracting top200Weekly...", fg = "cyan", bold = True)
 			api.top200Weekly(csv, None, webhook, start, end, region)
-			click.secho("Extraction complete", fg = "white", bold = True)
+			click.secho("Extraction complete\n", fg = "white", bold = True)
 		elif(chart == "top200Daily"):
 			click.secho("Extracting top200Daily...", fg = "cyan", bold = True)
 			api.top200Daily(csv, None, webhook, start, end, region)
-			click.secho("Extraction complete", fg = "white", bold = True)
+			click.secho("Extraction complete\n", fg = "white", bold = True)
 		elif(chart == "viral50Weekly"):
 			click.secho("Extracting viral50Weekly...", fg = "cyan", bold = True)
 			api.viral50Weekly(csv, None, webhook, start, end, region)
-			click.secho("Extraction complete", fg = "white", bold = True)
+			click.secho("Extraction complete\n", fg = "white", bold = True)
 		elif(chart == "viral50Daily"):
 			click.secho("Extracting viral50Daily...", fg = "cyan", bold = True)
 			api.viral50Daily(csv, None, webhook, start, end, region)
-			click.secho("Extraction complete", fg = "white", bold = True)
+			click.secho("Extraction complete\n", fg = "white", bold = True)
 		else:
 			click.secho(f"ERROR: {chart} could not be processed. Select either of: {', '.join(chart_choices)}", fg = "red", bold = True)
-
 
 		
 
