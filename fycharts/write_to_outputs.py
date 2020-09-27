@@ -45,8 +45,15 @@ def postToRestEndpoint(df, urls, which):
 	"""
 	fd = df.to_dict(orient = "records")
 	dump = {"chart": which, "data": fd}
+
+	if(type(urls) is list):
+		urls_ = urls
+	else:
+		urls_ = []
+		urls_.append(urls)
+
 	try:
-		for url in urls:
+		for url in urls_:
 			logger.info(f"POSTing data to the endpoint {url}")
 			requests.post(url, json = dump)
 			logger.info("Done POSTing")

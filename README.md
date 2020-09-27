@@ -3,31 +3,35 @@ A fully-fledged installable python package for extracting **top 200** and **vira
 
 In a nutshell, the unofficial Spotify Charts API
 
-## CONTENTS
-1. [Installation](#in)
-2. [Sample](#sample)
-3. [Functions for data extraction and the parameters they accept](#funcs)
-4. [Format for data returned](#format)
-5. [Supported country codes](#codes)
-6. [A note about dates](#dates)
-6. [Turbo-boosted recipe](#turbo)
-7. [Utilities you may find useful](#utils)
-8. [Changelog](#change)
+## CONTENT
+1. [Inspiration](#inspi)
+2. [Installation](#install)
+3. [Sample](#sample)
+4. [Design philosophy](#philosophy)
+5. [The CLI](#cli)
+6. [API Functions](#funcs)
+7. [Data returned](#form)
+8. [Country codes](#codes)
+9. [A note about dates](#dates)
+10. [Turbo-boosted recipe](#turbo)
+11. [A utility method](#util)
+12. [Changelog](#change)
 
-## INSPIRATION
+
+## INSPIRATION <a id="inspi"></a>
 This was built to fill the gap left when Spotify deprecated their official Spotify charts API. It arose as a needed crawler for the Spotify data analysis and machine learning project done [here](https://kelvingakuo.github.io)
 
-## INSTALLATION <a id="in"></a>
+fycharts exposes both a set of functions (an API), and a CLI.
+
+## INSTALLATION <a id="install"></a>
 ```bash
 pip install fycharts
 ```
-## API
-
-## CLI
-CLI only available for fycharts>=4.0.0
+**Note:** The CLI is only available for fycharts>=4.0.0
 
 ## SAMPLE USAGE <a id="sample"></a>
-Say you want to extract top 200 daily charts for all time, all regions
+Say you want to extract top 200 daily charts for all time, all regions:
+### API
 ```python
 myCrawler.py
 
@@ -36,8 +40,17 @@ from fycharts.SpotifyCharts import SpotifyCharts
 api = SpotifyCharts()
 api.top200Daily(output_file = "top_200_daily.csv")
 ```
+Then: ```python myCrawler.py```
 
-Or you want viral 50 daily charts for January 2019 in the us and globally, to be written into a csv file and a SQLLite db *Note: This works only for fycharts>=3.0.0*
+### CLI
+```fycharts top200Daily --csv top_200_daily.csv```
+___
+
+Or you want viral 50 daily charts for January 2019 in the us and globally, to be written into a csv file and a SQLLite db 
+
+**Note:** This works only for fycharts>=3.0.0
+
+### API
 ```python
 myCrawler.py
 
@@ -49,13 +62,45 @@ connector = sqlalchemy.create_engine("sqlite:///spotifycharts.db", echo=False)
 api.viral50Daily(output_file = "viral_50_daily.csv", output_db = connector, webhook = ["https://mywebhookssite.com/post/"], start = "2019-01-01", end = "2019-01-31", region = ["us", "global"])
 ```
 
-Run your program. 
-```bash
-python myCrawler.py
-```
-Watch the terminal for helpful information.
+Then: ```python myCrawler.py```
 
-## FUNCTIONS AND PARAMETERS <a id= "funcs"></a>
+### CLI
+```fycharts viral50Daily --csv viral_50_daily.csv --webhook https://mywebhookssite.com/post/ --start 2019-01-01 --end 2019-01-31 -r us -r global```
+
+
+**Note:** The CLI cannot write to a DB. You can however pass multiple webhooks to POST to:
+
+```-w https://mywebhookssite.com/post/1 -w https://mywebhookssite.com/post/2```
+___
+
+## DESIGN PHILOSOPHY <a id="philosophy"></a>
+The API was designed and published first (fycharts<4.0.0) then the CLI was introduced in v4.0.0. The CLI is merely a convinient wrapper over the API.
+
+This means that the rules that apply at the API level, also apply at the CLI level
+
+## THE CLI in a nutshell <a id = "cli"></a>
+```fycharts chartsName [OPTIONS]```
+
+The charts are:
+- top200Daily
+- top200Weekly
+- viral50Daily
+- viral50Weekly
+
+These invoke the [API functions](#funcs) exposed by the library
+
+The options are:
+```
+-s, --start         Start of date range (YYYY-MM-DD)
+-e, --end           End of date range (YYYY-MM-DD)
+-r, --region        Region(s) to get the chart for
+-c, --csv           Output CSV file (only one)
+-w, --webhook       Output webhook(s)
+```
+
+```fycharts --help``` for the MAN page
+
+## API functions <a id= "funcs"></a>
 For all the charts provided by Spotify, four functions exist:
 1. top200Weekly()
 2. top200Daily()
@@ -66,7 +111,7 @@ All four functions take the following parameters:
 #### Ouput options
 1. output_file - CSV file to write the data to (Compulsory for fycharts<3.0.0)
 2. output_db - A connector object for any database supported by SQLAlchemy (only available in fycharts>=3.0.0)
-3. webhook - A list of HTTP endpoints to POST the extracted data to (only available in fycharts>=3.0.0)
+3. webhook - A HTTP endpoint (or a list of them) to POST the extracted data to (only available in fycharts>=3.0.0)
 
     *Create webhooks for testing here: https://webhook.site/ or here: https://beeceptor.com/*
 
@@ -136,7 +181,9 @@ The data extracted from spotifycharts.com is written to the output with the foll
 }
 ```
 
-## SUPPORTED COUNTRY CODES SO FAR  <a id= "codes"></a>
+## COUNTRY CODES <a id= "codes"></a>
+Only the following country codes are supported so far:
+
 |   |   |   |   |   |   |   |   |
 |---|---|---|---|---|---|---|---|
 |ad |ca |dk |gr |is |mx |ph |sv |
@@ -187,8 +234,8 @@ if __name__ == "__main__":
 
 **TAKE NOTE:** **DO NOT** SHARE THE OUTPUT DESTINATION ACROSS THE FUNCTIONS i.e. each function should be writing to its own set of outputs
 
-## UTILITY FUNCTIONS <a id = "utils"></a>
-This library exposes some functions that you may find of use:
+## A UTILITY FUNCTION <a id = "util"></a>
+The API exposes a function that you may find of use:
 
 1. validDates(start, end, desired)
 
@@ -207,6 +254,13 @@ This function prints a list of valid dates for the kind of data you are interest
 
 ## CHANGELOG <a id = "change"></a>
 *This changelog loosely follows semantic versioning*
+### 4.0.0 27th Sept 2020
+**Fixed**
+* A bug in reading in a list of regions
+
+**Added**
+* CLI functionality to fycharts
+
 ### 3.1.0 4th Feb 2020
 **Added**
 * Identifying info to payload POSTed to webhook
@@ -244,8 +298,3 @@ This function prints a list of valid dates for the kind of data you are interest
 
 ### 1.0.0 26th Dec 2018
 * Released project named "Spotify-Charts-API"
-
-
-## PLAN
-1. Implement CLI version
-2. Release V4.0.0
