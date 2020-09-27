@@ -256,6 +256,11 @@ This function prints a list of valid dates for the kind of data you are interest
 
 ## CHANGELOG <a id = "change"></a>
 *This changelog loosely follows semantic versioning*
+
+### 4.0.1 27th Sept 2020
+**Fixed**
+* Some bugs
+
 ### 4.0.0 27th Sept 2020
 **Fixed**
 * A bug in reading in a list of regions
