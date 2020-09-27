@@ -59,3 +59,15 @@ def postToRestEndpoint(df, urls, which):
 			logger.info("Done POSTing")
 	except Exception as e:
 		raise(e)
+
+
+# def pushToCallback(df, callback, which):
+# 	fd = df.to_dict(orient = "records")
+# 	dump = {"chart": which, "data": fd}
+
+# 	try:
+# 		logger.info(f"Pushing data to callback function")
+# 		callback(dump)
+# 		logger.info("Done pusing")
+# 	except Exception as e:
+# 		raise(e)

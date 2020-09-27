@@ -8,13 +8,13 @@ from .crawler_base import SpotifyChartsBase
 from .compute_dates import returnDatesAndRegions
 from .compute_dates import whatDates
 from .log_config import logger
+
 from .write_to_outputs import writeToCSV
 from .write_to_outputs import writeToSQLTable
 from .write_to_outputs import postToRestEndpoint
+# from .write_to_outputs import pushToCallback
 
 from .exceptions import FyChartsException
-
-
 
 def validateFile(fileName):
 	if(".csv" in fileName):
@@ -29,6 +29,7 @@ class SpotifyCharts(SpotifyChartsBase):
 		self.csv_data_queue = Queue()
 		self.db_data_queue = Queue()
 		self.post_data_queue = Queue()
+		# self.callback_data_queue = Queue()
 
 	def __write_to_csv_from_queue(self, data_q):
 		""" Reads a dataframe from the queue, then writes to CSV
@@ -88,6 +89,25 @@ class SpotifyCharts(SpotifyChartsBase):
 		except Exception as e:
 			raise RuntimeError(e)
 
+	# def __pass_to_callback_from_queue(self, data_q):
+	# 	""" Reads a dataframe from the queue, then passes it to a callback function
+	# 	"""
+	# 	try:
+	# 		work = True
+	# 		while work:
+	# 			data = data_q.get(block = True)
+	# 			if data is None:
+	# 				work = False
+	# 				return
+	# 			else:
+	# 				df = data["df"]
+	# 				callback = data["callback"]
+	# 				what_data = data["which_one"]
+
+	# 				pushToCallback(df, callback, what_data)
+	# 	except Exception as e:
+	# 		raise RuntimeError(e)
+
 	def top200Weekly(self, output_file = None, output_db = None, webhook = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 weekly
 		Params:
@@ -115,34 +135,51 @@ class SpotifyCharts(SpotifyChartsBase):
 		if(webhook is not None):
 			ahook_thread = threading.Thread(target = self.__post_to_endpoint_from_queue, args = (self.post_data_queue,))
 			ahook_thread.start()
+		# if(callable(callback)):
+		# 	# Callback function given
+		# 	a_call_thread = threading.Thread(target = self.__pass_to_callback_from_queue, args = (self.callback_data_queue,))
+		# 	a_call_thread.start()
+
 
 		if(output_file is None and output_db is None and webhook is None):
 			raise FyChartsException("Please provide at least one output destination")
+		
+		try:
+			j = 0
+			while(j < len(dates)):
+				if((j + 1) == len(dates)): 
+					break
+				theRange = dates[j]+"--"+dates[j+1]
 
-		j = 0
-		while(j < len(dates)):
-			if((j + 1) == len(dates)): 
-				break
-			theRange = dates[j]+"--"+dates[j+1]
+				k = j
+				for region in regions:
+					df = super().helperTop200Weekly(theRange, region)
+					if(output_file is not None):
+						dict_for_csv = {"df": df, "out_file": file, "j": k}
+						self.csv_data_queue.put(dict_for_csv)
+					if(output_db is not None):
+						dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Weekly"}
+						self.db_data_queue.put(dict_for_db)
+					if(webhook is not None):
+						dict_for_hook = {"df": df, "url": webhook, "which_one": "top_200_weekly"}
+						self.post_data_queue.put(dict_for_hook)
+					# if(callable(callback)):
+					# 	dict_for_callback = {"df": df, "callback": fn, "which_one": "top_200_weekly"}
+					# 	self.callback_data_queue.put(dict_for_callback)
 
-			k = j
-			for region in regions:
-				df = super().helperTop200Weekly(theRange, region)
-				if(output_file is not None):
-					dict_for_csv = {"df": df, "out_file": file, "j": k}
-					self.csv_data_queue.put(dict_for_csv)
-				if(output_db is not None):
-					dict_for_db = {"df": df, "conn": output_db, "data_type": "top200Weekly"}
-					self.db_data_queue.put(dict_for_db)
-				if(webhook is not None):
-					dict_for_hook = {"df": df, "url": webhook, "which_one": "top_200_weekly"}
-					self.post_data_queue.put(dict_for_hook)
+					k = k + 1
+				j = j + 1
+		except Exception as e:
+			a_thread.join()
+			adb_thread.join()
+			ahook_thread.join()
+			# a_call_thread.join()
+			raise(e)
 
-				k = k + 1
-			j = j + 1
 		self.csv_data_queue.put(None)
 		self.db_data_queue.put(None)
 		self.post_data_queue.put(None)
+		# self.callback_data_queue.put(None)
 
 	def top200Daily(self, output_file = None, output_db = None, webhook = None, start = None, end = None, region = None):
 		"""Write to file the charts data for top 200 daily

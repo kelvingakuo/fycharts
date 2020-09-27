@@ -112,6 +112,11 @@ def returnDatesAndRegions(start=None, end=None, theRegs=None, isWeekly=False, is
 	if(theRegs is None):
 		region = regions
 	else:
+		if(type(theRegs) is not list):
+			regs = []
+			regs.append(theRegs)
+			theRegs = regs
+			
 		for aReg in theRegs:
 			if(aReg in regions):
 				region.append(aReg)
