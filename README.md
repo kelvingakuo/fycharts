@@ -100,6 +100,8 @@ The options are:
 
 ```fycharts --help``` for the MAN page
 
+*The CLI has been tested on Ubuntu 18.04LTS (Bionic Beaver) and Windows 10 Home v1909*
+
 ## API functions <a id= "funcs"></a>
 For all the charts provided by Spotify, four functions exist:
 1. top200Weekly()
@@ -120,7 +122,7 @@ All four functions take the following parameters:
 2. end - End date of range of interest as string with the format YYYY-MM-DD
 3. region - Region (or a list of regions e.g. ["global", "us", "fr"]) of interest, as a country abbreviation code. "global" is also valid
 
-    *Refer to [SUPPORTED COUNTRY CODES SO FAR](#codes) below for supported regions.*
+    *Refer to [COUNTRY CODES](#codes) below for supported regions.*
 
 If not specified, data is extracted for all dates, all regions
 
