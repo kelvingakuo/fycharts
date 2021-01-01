@@ -256,6 +256,9 @@ This function prints a list of valid dates for the kind of data you are interest
 
 ## CHANGELOG <a id = "change"></a>
 *This changelog loosely follows semantic versioning*
+### 4.0.2 1st Jan 2021
+**Fixed**
+* Freezing due to no data being returned for some region-chart combinations (Issue #4) by reducing retries
 
 ### 4.0.1 27th Sept 2020
 **Fixed**
