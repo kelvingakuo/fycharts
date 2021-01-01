@@ -71,10 +71,13 @@ class SpotifyChartsBase(object):
 				s = requests.Session()
 				s.mount("https://", HTTPAdapter(max_retries = retries))
 				res = s.get(url, headers = headers, timeout = 3)
+
 				if(res.status_code == 200):
 					if(res.headers["Content-Type"] == "text/html; charset=UTF-8"):
 						self.logger.error("***** Data not found. Generating empty dataframe *****")
+
 						df = emptyDf(size, region, date)
+
 					else:
 						data = res.content
 						if(isSkip):
