@@ -58,7 +58,6 @@ class SpotifyChartsBase(object):
 		
 		return trackId
 
-
 	def __makeRequests(self, url, date, region, isSkip, size):
 			"""Make the HTTP request, clean data, and return as df
 			url - The URL to make request
@@ -95,7 +94,7 @@ class SpotifyChartsBase(object):
 
 				return df
 			except Exception as e:
-				self.logger.error(f"***** <<{e}>> Data not found. Generating empty dataframe *****")
+				self.logger.error(f"*****Data not found with error <<{e}>>. Generating empty dataframe *****")
 
 				df = emptyDf(size, region, date)
 				
