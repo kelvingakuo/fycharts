@@ -15,7 +15,7 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     install_requires=[
         "pandas==1.1.2",
-        "requests==2.24.0",
+        "requests==2.31.0",
         "click==7.1.2",
         "colorama==0.4.3"
     ],
